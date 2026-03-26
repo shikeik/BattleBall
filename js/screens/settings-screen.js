@@ -38,8 +38,8 @@ class SettingsScreen extends Screen {
 		this.uiViewport.apply(ctx);
 		this.uiViewport.beginWorldRender(ctx);
 
-		const w = viewport.worldWidth;
-		const h = viewport.worldHeight;
+		const w = this.uiViewport.worldWidth;
+		const h = this.uiViewport.worldHeight;
 
 		// 背景
 		ctx.fillStyle = '#16213e';
