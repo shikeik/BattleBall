@@ -200,17 +200,25 @@ class BattleBallScreen extends Screen {
 		// 底部提示
 		ctx.fillStyle = '#888888';
 		ctx.textAlign = 'center';
-		ctx.fillText('点击屏幕返回主菜单', w / 2, h - 30);
+		ctx.fillText('使用工具条返回按钮退出', w / 2, h - 30);
 		
 		this.uiViewport.endWorldRender(ctx);
 	}
 	
 	/**
 	 * 设置相机缩放
+	 * @param {number} viewScale - 视野大小系数 (1-10)
+	 *   1 = 当前 3x 放大效果（近距离）
+	 *   10 = 总览全图（远距离）
 	 */
-	setCameraZoom(zoom) {
-		this.worldCamera.zoom = Math.max(0.5, Math.min(3.0, zoom));
-		if (window.logger) logger.log('BATTLE', `Camera zoom: ${this.worldCamera.zoom.toFixed(2)}`);
+	setCameraZoom(viewScale) {
+		// 将 1-10 映射到 3.0-0.3 的 zoom 值
+		// 1 -> 3.0x (放大，近距离)
+		// 10 -> 0.3x (缩小，远距离，总览全图)
+		const normalized = Math.max(1, Math.min(10, viewScale));
+		const zoom = 3.0 - (normalized - 1) * (2.7 / 9); // 从 3.0 线性降到 0.3
+		this.worldCamera.zoom = zoom;
+		if (window.logger) logger.log('BATTLE', `Camera zoom: ${zoom.toFixed(2)} (viewScale: ${normalized})`);
 	}
 	
 	/**
@@ -231,25 +239,15 @@ class BattleBallScreen extends Screen {
 	 * 绑定事件
 	 */
 	_bindEvents() {
-		const canvas = this.getCanvas();
-		if (!canvas) return;
-		
-		// 点击返回
-		this._onClick = () => {
-			if (window.logger) logger.log('BATTLE', 'Screen clicked, going back');
-			this.screenManager.popScreen();
-		};
-		canvas.addEventListener('click', this._onClick);
+		// 不再绑定点击返回事件，避免误触
+		// 返回只能通过工具条返回按钮或物理返回键
 	}
 	
 	/**
 	 * 解绑事件
 	 */
 	_unbindEvents() {
-		const canvas = this.getCanvas();
-		if (canvas) {
-			canvas.removeEventListener('click', this._onClick);
-		}
+		// 无事件需要解绑
 	}
 	
 	handleBack() {
