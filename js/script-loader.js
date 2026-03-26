@@ -95,6 +95,7 @@ const SCRIPT_GROUPS = {
 	scene: [
 		{ name: 'Scene Base', src: 'js/scene/scene.js', weight: 1 },
 		{ name: 'Scene Manager', src: 'js/scene/scene-manager.js', weight: 1 },
+		{ name: 'Selection Scene', src: 'js/scene/selection-scene.js', weight: 1 },
 	],
 	
 	// 游戏场景
