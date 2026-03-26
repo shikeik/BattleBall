@@ -1,0 +1,19 @@
+/**
+ * CSS 变量和层级系统
+ * 与 js/ui/layers.js 保持一致
+ */
+
+:root {
+	/* 基础层级 */
+	--layer-game: 0;
+	--layer-world-ui: 1000;
+	--layer-hud: 2000;
+	--layer-weapon: 3000;
+	--layer-controls: 4000;
+	--layer-panel: 5000;
+	--layer-start-screen: 8000;
+	--layer-ship-viewer: 8500;
+	--layer-game-over: 9000;
+	--layer-debug: 10000;
+	--layer-toolbar: 10001;
+}

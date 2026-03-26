@@ -1,0 +1,19 @@
+/* ===== 基础重置 ===== */
+* {
+	margin: 0;
+	padding: 0;
+	box-sizing: border-box;
+	touch-action: none;
+}
+
+/* 可滚动区域需要启用触摸 */
+.scrollable, .scrollable * {
+	touch-action: pan-y !important;
+	-webkit-overflow-scrolling: touch;
+}
+
+body {
+	background: #000;
+	overflow: hidden;
+	font-family: 'Orbitron', monospace;
+}

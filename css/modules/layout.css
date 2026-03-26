@@ -1,0 +1,46 @@
+/* ===== 布局系统 ===== */
+
+/* 游戏画布 */
+#gameCanvas {
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100vw;
+	height: 100vh;
+	z-index: 1;
+}
+
+/* UI层：包含toolbar和main-layout */
+#ui-layer {
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	z-index: var(--layer-hud);
+	pointer-events: none;
+}
+
+#ui-layer > * {
+	pointer-events: auto;
+}
+
+/* 主布局容器 - 上下二分 */
+#main-layout {
+	position: absolute;
+	top: 40px;
+	left: 0;
+	width: 100%;
+	height: calc(100% - 40px);
+}
+
+/* 传统UI容器（逐步迁移到main-layout） */
+#ui {
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	z-index: var(--layer-hud);
+	pointer-events: none;
+}
