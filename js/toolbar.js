@@ -107,11 +107,20 @@ class Toolbar {
 			onClick: () => this.goBack()
 		});
 		
+		// 第2个按钮：全屏切换
 		this.registerButton({
 			id: 'fullscreen',
 			icon: '⛶',
 			page: 0,
 			onClick: () => this.toggleFullscreen()
+		});
+		
+		// 第3个按钮：转屏切换
+		this.registerButton({
+			id: 'rotate',
+			icon: '🔄',
+			page: 0,
+			onClick: () => this.toggleOrientation()
 		});
 		
 		this.registerButton({
@@ -434,20 +443,81 @@ class Toolbar {
 		try {
 			if (!document.fullscreenElement) {
 				await document.documentElement.requestFullscreen();
-				if (screen.orientation?.lock) {
-					screen.orientation.lock('landscape').catch(() => {});
-				}
-				if (window.logger) logger.log('TOOLBAR', '进入全屏并切换为横屏');
+				if (window.logger) logger.log('TOOLBAR', '进入全屏');
 			} else {
 				await document.exitFullscreen();
-				if (screen.orientation?.lock) {
-					screen.orientation.lock('portrait').catch(() => {});
-				}
-				if (window.logger) logger.log('TOOLBAR', '退出全屏并返回竖屏');
+				if (window.logger) logger.log('TOOLBAR', '退出全屏');
 			}
+			
+			// 延迟触发 resize，等待屏幕尺寸稳定（全屏切换可能需要更长时间）
+			setTimeout(() => {
+				this._notifyResize();
+			}, 500);
+			
 		} catch (e) {
 			console.log('全屏切换失败:', e);
 		}
+	}
+	
+	// 切换屏幕方向（转屏）
+	async toggleOrientation() {
+		try {
+			if (!screen.orientation) {
+				if (window.logger) logger.log('TOOLBAR', '当前设备不支持屏幕方向锁定');
+				return;
+			}
+			
+			// 使用 window.innerWidth/Height 判断当前方向更准确
+			const isLandscape = window.innerWidth > window.innerHeight;
+			
+			if (window.logger) logger.log('TOOLBAR', `当前方向: ${isLandscape ? '横屏' : '竖屏'}, 准备切换...`);
+			
+			let lockResult;
+			if (isLandscape) {
+				// 当前是横屏，切换到竖屏
+				lockResult = await screen.orientation.lock('portrait').catch((e) => e);
+				if (lockResult instanceof Error) {
+					if (window.logger) logger.log('TOOLBAR', `切换到竖屏失败: ${lockResult.message}`);
+				} else {
+					if (window.logger) logger.log('TOOLBAR', '切换到竖屏成功');
+				}
+			} else {
+				// 当前是竖屏，切换到横屏
+				lockResult = await screen.orientation.lock('landscape').catch((e) => e);
+				if (lockResult instanceof Error) {
+					if (window.logger) logger.log('TOOLBAR', `切换到横屏失败: ${lockResult.message}`);
+				} else {
+					if (window.logger) logger.log('TOOLBAR', '切换到横屏成功');
+				}
+			}
+			
+			// 延迟触发 resize，等待屏幕尺寸稳定
+			setTimeout(() => {
+				this._notifyResize();
+			}, 500);
+			
+		} catch (e) {
+			if (window.logger) logger.log('TOOLBAR', `转屏失败: ${e.message}`);
+			console.log('转屏失败:', e);
+		}
+	}
+	
+	/**
+	 * 通知当前屏幕触发 resize 处理
+	 * 用于全屏切换后的强制刷新
+	 */
+	_notifyResize() {
+		// 通知当前屏幕
+		if (window.screenManager && window.screenManager.currentScreen) {
+			const screen = window.screenManager.currentScreen;
+			if (screen.resize) {
+				screen.resize();
+				if (window.logger) logger.log('TOOLBAR', 'Notified current screen to resize');
+			}
+		}
+		
+		// 同时触发全局 resize 事件（让其他监听者也能收到）
+		window.dispatchEvent(new Event('resize'));
 	}
 	
 	// 切换设置面板
