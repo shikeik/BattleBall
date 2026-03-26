@@ -152,11 +152,22 @@ loading.registerTask('My Game', async () => {
 
 ### 4. 防缓存系统
 
-修改 `index.html` 中的版本号强制刷新：
+**原理：** URL 时间戳确保加载最新代码
 
+**触发刷新的情况：**
+1. **首次访问** - 自动添加时间戳 `?t=xxx`
+2. **版本号变化** - 修改 `BUILD_VERSION` 强制刷新
+3. **主动刷新** - F5/刷新按钮且超过 5 秒
+
+**使用方式：**
 ```javascript
-window.BUILD_VERSION = "1.0.0.0";  // 更新版本号触发刷新
+// 正常开发无需修改，系统自动处理
+window.BUILD_VERSION = "1.0.0.0";  // 版本号（可选，用于标识）
 ```
+
+**手动强制刷新：**
+- 修改 `BUILD_VERSION` 值，或
+- 在 URL 后添加 `?t=123456`（任意数字）
 
 ---
 
@@ -191,8 +202,8 @@ element.style.zIndex = 9999;
    cd my-new-game
    ```
 
-2. **修改版本号**
-   - 编辑 `index.html` 中的 `BUILD_VERSION`
+2. **修改版本号（可选）**
+   - 编辑 `index.html` 中的 `BUILD_VERSION` 标识版本
 
 3. **添加游戏脚本**
    - 在 `js/` 下创建新目录（如 `js/my-game/`）
@@ -246,6 +257,6 @@ console.log('player move', x, y);
 ## 注意事项
 
 1. **手机调试必须使用 logger**，console.log 看不到
-2. **修改 BUILD_VERSION** 触发防缓存刷新
+2. **防缓存自动处理**，首次访问和刷新时自动加时间戳
 3. **使用 UILayers** 管理 z-index
 4. **运行 indentFix.sh** 保持缩进规范
