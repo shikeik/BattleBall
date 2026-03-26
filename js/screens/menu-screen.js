@@ -14,6 +14,23 @@ class MenuScreen extends SelectionScreen {
 
 // 占位符游戏界面，后续实现
 class GameScreen extends Screen {
+	init() {
+		this.canvas = document.getElementById('gameCanvas');
+		if (window.logger) logger.log('GAME', 'GameScreen init');
+	}
+	
+	enter() {
+		super.enter();
+		this._bindEvents();
+		if (window.logger) logger.log('GAME', 'GameScreen enter, events bound');
+	}
+	
+	exit() {
+		super.exit();
+		this._unbindEvents();
+		if (window.logger) logger.log('GAME', 'GameScreen exit, events unbound');
+	}
+	
 	render(delta) {
 		if (!this.canvas) return;
 		const ctx = this.canvas.getContext('2d');
@@ -39,12 +56,31 @@ class GameScreen extends Screen {
 
 		ctx.font = '14px sans-serif';
 		ctx.fillStyle = '#666';
-		ctx.fillText('ESC 返回主菜单', w / 2, h - 30);
+		ctx.fillText('点击屏幕返回主菜单', w / 2, h - 30);
 		
 		viewport.endWorldRender(ctx);
 	}
+	
+	_handleClick() {
+		if (window.logger) logger.log('GAME', 'Screen clicked, going back to menu');
+		this.screenManager.replaceScreen(MenuScreen);
+	}
+	
+	_bindEvents() {
+		this._onClick = () => this._handleClick();
+		this.canvas.addEventListener('click', this._onClick);
+		this.canvas.addEventListener('touchstart', this._onClick);
+	}
+	
+	_unbindEvents() {
+		if (this.canvas) {
+			this.canvas.removeEventListener('click', this._onClick);
+			this.canvas.removeEventListener('touchstart', this._onClick);
+		}
+	}
 
 	handleBack() {
+		if (window.logger) logger.log('GAME', 'handleBack called');
 		this.screenManager.replaceScreen(MenuScreen);
 		return true;
 	}
