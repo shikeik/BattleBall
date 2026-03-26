@@ -4,6 +4,7 @@
  */
 class MenuScene extends SelectionScene {
 	initScreenMapping(map) {
+		console.log('initScreenMapping:', { GameScene, WebGPUScene, SettingsScene });
 		map.set('开始游戏', GameScene);
 		map.set('WebGPU 演示', WebGPUScene);
 		map.set('其他', null); // 分隔线

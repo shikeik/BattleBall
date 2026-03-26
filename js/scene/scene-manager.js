@@ -28,6 +28,10 @@ class SceneManager {
 	 * 注册场景
 	 */
 	register(sceneClass, instance) {
+		if (this.scenes.has(sceneClass)) {
+			if (window.logger) logger.log('SCENE_MGR', `${sceneClass.name} already registered`);
+			return this;
+		}
 		if (!instance) {
 			instance = new sceneClass(this);
 		}
@@ -41,8 +45,8 @@ class SceneManager {
 	 * 设置启动场景
 	 */
 	setLaunchScene(sceneClass) {
-		this.launchScene = this._getOrCreate(sceneClass);
-		this.goScene(this.launchScene);
+		this.launchScene = sceneClass;
+		this.goScene(sceneClass);
 		return this;
 	}
 
@@ -50,10 +54,15 @@ class SceneManager {
 	 * 进入场景（入栈，可返回）
 	 */
 	goScene(sceneClass) {
+		console.log('goScene:', sceneClass.name);
 		const next = this._getOrCreate(sceneClass);
+		console.log('got instance:', next.constructor.name);
 
 		// 相同场景忽略
-		if (this.currentScene === next) return this;
+		if (this.currentScene === next) {
+			console.log('same scene, ignoring');
+			return this;
+		}
 
 		this._initializeScene(next);
 
@@ -97,6 +106,7 @@ class SceneManager {
 	 * 替换场景（重新创建）
 	 */
 	replaceScene(sceneClass) {
+		console.log('replaceScene:', sceneClass.name);
 		// 移除旧实例
 		if (this.scenes.has(sceneClass)) {
 			const old = this.scenes.get(sceneClass);
@@ -269,7 +279,13 @@ class SceneManager {
 
 	_getOrCreate(sceneClass) {
 		if (!this.scenes.has(sceneClass)) {
-			this.register(sceneClass, new sceneClass(this));
+			if (typeof sceneClass !== 'function') {
+				throw new Error(`sceneClass is not a constructor: ${sceneClass} (type: ${typeof sceneClass})`);
+			}
+			const instance = new sceneClass(this);
+			this.scenes.set(sceneClass, instance);
+			instance.sceneManager = this;
+			if (window.logger) logger.log('SCENE_MGR', `Created ${sceneClass.name}`);
 		}
 		return this.scenes.get(sceneClass);
 	}

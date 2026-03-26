@@ -14,6 +14,13 @@ class SelectionScene extends Scene {
 	init() {
 		this.canvas = document.getElementById('gameCanvas');
 		this.initScreenMapping(this.screenMapping);
+		
+		// 检查 mapping 中的值
+		for (const [key, value] of this.screenMapping) {
+			if (value !== null && typeof value !== 'function') {
+				console.error(`Invalid scene class for "${key}":`, value, typeof value);
+			}
+		}
 	}
 
 	/**
@@ -113,45 +120,93 @@ class SelectionScene extends Scene {
 	 * 默认行为：replaceScreen
 	 */
 	onScreenSelected(sceneClass) {
+		console.log('onScreenSelected:', sceneClass.name);
 		this.sceneManager.replaceScreen(sceneClass);
 	}
 
 	_bindEvents() {
-		this._onMouseMove = (e) => {
+		// 获取缩放比例（canvas 逻辑坐标 -> 实际像素坐标）
+		const getScale = () => {
 			const rect = this.canvas.getBoundingClientRect();
-			const x = e.clientX - rect.left;
-			const y = e.clientY - rect.top;
+			return {
+				x: this.canvas.width / rect.width,
+				y: this.canvas.height / rect.height
+			};
+		};
 
-			let newHovered = -1;
+		// 转换坐标
+		const getPointerPos = (clientX, clientY) => {
+			const rect = this.canvas.getBoundingClientRect();
+			const scale = getScale();
+			return {
+				x: (clientX - rect.left) * scale.x,
+				y: (clientY - rect.top) * scale.y
+			};
+		};
+
+		// 检查点击位置
+		const checkHit = (x, y) => {
 			for (const btn of this.buttons) {
 				if (x >= btn.x && x <= btn.x + btn.w &&
 					y >= btn.y && y <= btn.y + btn.h) {
-					newHovered = btn.index;
-					break;
+					return btn.index;
 				}
 			}
-
-			if (newHovered !== this.hoveredIndex) {
-				this.hoveredIndex = newHovered;
-			}
+			return -1;
 		};
 
+		// 鼠标移动（PC）
+		this._onMouseMove = (e) => {
+			const pos = getPointerPos(e.clientX, e.clientY);
+			this.hoveredIndex = checkHit(pos.x, pos.y);
+		};
+
+		// 点击（PC）
 		this._onClick = (e) => {
-			if (this.hoveredIndex >= 0 && this.hoveredIndex < this.buttons.length) {
-				const btn = this.buttons[this.hoveredIndex];
+			const pos = getPointerPos(e.clientX, e.clientY);
+			const index = checkHit(pos.x, pos.y);
+			console.log('Click at', pos, 'hit index', index, 'buttons', this.buttons.length);
+			if (index >= 0) {
+				const btn = this.buttons[index];
+				console.log('Selected:', btn.sceneClass.name);
 				if (window.logger) logger.log('SELECT', `Selected: ${btn.sceneClass.name}`);
 				this.onScreenSelected(btn.sceneClass);
 			}
 		};
 
+		// 触摸开始（移动端）
+		this._onTouchStart = (e) => {
+			e.preventDefault();
+			const touch = e.touches[0];
+			const pos = getPointerPos(touch.clientX, touch.clientY);
+			this.hoveredIndex = checkHit(pos.x, pos.y);
+		};
+
+		// 触摸结束（移动端）
+		this._onTouchEnd = (e) => {
+			e.preventDefault();
+			console.log('TouchEnd, hoveredIndex:', this.hoveredIndex);
+			if (this.hoveredIndex >= 0) {
+				const btn = this.buttons[this.hoveredIndex];
+				console.log('Touch selected:', btn.sceneClass.name);
+				if (window.logger) logger.log('SELECT', `Selected: ${btn.sceneClass.name}`);
+				this.onScreenSelected(btn.sceneClass);
+				this.hoveredIndex = -1;
+			}
+		};
+
 		this.canvas.addEventListener('mousemove', this._onMouseMove);
 		this.canvas.addEventListener('click', this._onClick);
+		this.canvas.addEventListener('touchstart', this._onTouchStart, { passive: false });
+		this.canvas.addEventListener('touchend', this._onTouchEnd, { passive: false });
 	}
 
 	_unbindEvents() {
 		if (this.canvas) {
 			this.canvas.removeEventListener('mousemove', this._onMouseMove);
 			this.canvas.removeEventListener('click', this._onClick);
+			this.canvas.removeEventListener('touchstart', this._onTouchStart);
+			this.canvas.removeEventListener('touchend', this._onTouchEnd);
 		}
 	}
 }

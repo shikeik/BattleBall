@@ -98,11 +98,11 @@ const SCRIPT_GROUPS = {
 		{ name: 'Selection Scene', src: 'js/scene/selection-scene.js', weight: 1 },
 	],
 	
-	// 游戏场景
+	// 游戏场景（注意加载顺序，被依赖的先加载）
 	scenes: [
-		{ name: 'Menu Scene', src: 'js/scenes/menu-scene.js', weight: 1 },
 		{ name: 'WebGPU Scene', src: 'js/scenes/webgpu-scene.js', weight: 1 },
 		{ name: 'Settings Scene', src: 'js/scenes/settings-scene.js', weight: 1 },
+		{ name: 'Menu Scene', src: 'js/scenes/menu-scene.js', weight: 1 },
 	],
 };
 
