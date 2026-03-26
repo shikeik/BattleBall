@@ -86,10 +86,10 @@ const SCRIPT_GROUPS = {
 		{ name: 'Toolbar', src: 'js/toolbar.js', weight: 1 },
 	],
 	
-	// TODO: 在这里添加新游戏的脚本组
-	// myGame: [
-	//     { name: 'MyGame Core', src: 'js/my-game/game.js', weight: 3 },
-	// ],
+	// WebGPU 演示
+	webgpuDemo: [
+		{ name: 'WebGPU Demo', src: 'js/webgpu-demo/webgpu-demo.js', weight: 1 },
+	],
 };
 
 // 导出

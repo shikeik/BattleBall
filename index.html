@@ -104,8 +104,13 @@
 				
 				// 工具栏
 				loading.registerTask('Toolbar', async () => {
-					await loader.loadBatch(SCRIPT_GROUPS.toolbar, (p, s) => loading.updateProgress(50 + p * 0.5, s));
-				}, 50);
+					await loader.loadBatch(SCRIPT_GROUPS.toolbar, (p, s) => loading.updateProgress(50 + p * 0.3, s));
+				}, 30);
+				
+				// WebGPU 演示
+				loading.registerTask('WebGPU Demo', async () => {
+					await loader.loadBatch(SCRIPT_GROUPS.webgpuDemo, (p, s) => loading.updateProgress(80 + p * 0.2, s));
+				}, 20);
 				
 				// 4. 加载完成回调
 				loading.onComplete = () => {
@@ -119,11 +124,11 @@
 						window.toolbar = new Toolbar();
 					}
 					
-					// TODO: 在这里初始化你的新游戏
-					// window.myGame = new MyGame();
+					// 初始化 WebGPU 演示
+					initWebGPUDemo();
 					
 					if (window.logger) {
-						logger.log('system', 'Framework loaded, ready for new game');
+						logger.log('system', 'Framework loaded, WebGPU demo ready');
 					}
 				};
 				
@@ -133,6 +138,48 @@
 			} catch (e) {
 				console.error('Loading failed:', e);
 				document.body.innerHTML = '<div style="color:#f00;text-align:center;padding:50px;">Failed to load. Please refresh.</div>';
+			}
+		}
+		
+		// WebGPU 演示初始化函数
+		async function initWebGPUDemo() {
+			const canvas = document.getElementById('gameCanvas');
+			if (!canvas) {
+				if (window.logger) logger.log('WEBGPU', 'Canvas not found');
+				return;
+			}
+			
+			// 设置 canvas 尺寸
+			canvas.width = Math.min(window.innerWidth, window.innerHeight) * 0.9;
+			canvas.height = canvas.width;
+			
+			if (!window.WebGPUDemo) {
+				if (window.logger) logger.log('WEBGPU', 'WebGPUDemo class not loaded');
+				return;
+			}
+			
+			try {
+				const demo = new WebGPUDemo(canvas);
+				await demo.init();
+				demo.start();
+				window.webgpuDemo = demo;
+				
+				// 添加工具栏按钮控制演示
+				if (window.toolbar) {
+					window.toolbar.addToolButton({
+						id: 'webgpuToggle',
+						icon: '■',
+						page: 0,
+						onClick: () => {
+							if (window.webgpuDemo) {
+								window.webgpuDemo.stop();
+								if (window.logger) logger.log('WEBGPU', 'Demo stopped by user');
+							}
+						}
+					});
+				}
+			} catch (e) {
+				if (window.logger) logger.log('WEBGPU', 'Failed to init demo', { error: e.message });
 			}
 		}
 		
