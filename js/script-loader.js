@@ -86,10 +86,25 @@ const SCRIPT_GROUPS = {
 		{ name: 'Toolbar', src: 'js/toolbar.js', weight: 1 },
 	],
 	
-	// TODO: 在这里添加新游戏的脚本组
-	// myGame: [
-	//     { name: 'MyGame Core', src: 'js/my-game/game.js', weight: 3 },
-	// ],
+	// WebGPU 演示
+	webgpuDemo: [
+		{ name: 'WebGPU Demo', src: 'js/webgpu-demo/webgpu-demo.js', weight: 1 },
+	],
+	
+	// 屏幕管理系统
+	screen: [
+		{ name: 'Viewport', src: 'js/screen/viewport.js', weight: 1 },
+		{ name: 'Screen Base', src: 'js/screen/screen.js', weight: 1 },
+		{ name: 'Screen Manager', src: 'js/screen/screen-manager.js', weight: 1 },
+		{ name: 'Selection Screen', src: 'js/screen/selection-screen.js', weight: 1 },
+	],
+	
+	// 游戏屏幕（注意加载顺序，被依赖的先加载）
+	screens: [
+		{ name: 'WebGPU Screen', src: 'js/screens/webgpu-screen.js', weight: 1 },
+		{ name: 'Settings Screen', src: 'js/screens/settings-screen.js', weight: 1 },
+		{ name: 'Menu Screen', src: 'js/screens/menu-screen.js', weight: 1 },
+	],
 };
 
 // 导出

@@ -407,18 +407,26 @@ class Toolbar {
 	
 	// ========== 原有功能方法 ==========
 	
-	// 返回按钮 - 可自定义行为
+	// 返回按钮 - 调用屏幕管理器
 	goBack() {
 		if (window.logger) logger.log('TOOLBAR', 'Back button clicked');
 		
-		// TODO: 在这里添加自定义返回逻辑
-		// 例如：关闭当前面板、返回上一页等
-		
-		// 默认行为：关闭设置和调试面板
+		// 优先关闭面板
 		const settingsPanel = document.getElementById('settings-panel');
 		const debugPanel = document.getElementById('debug-panel');
-		if (settingsPanel) settingsPanel.style.display = 'none';
-		if (debugPanel) debugPanel.style.display = 'none';
+		if (settingsPanel && settingsPanel.style.display !== 'none') {
+			settingsPanel.style.display = 'none';
+			return;
+		}
+		if (debugPanel && debugPanel.style.display !== 'none') {
+			debugPanel.style.display = 'none';
+			return;
+		}
+		
+		// 调用屏幕管理器处理返回
+		if (window.screenManager) {
+			window.screenManager.handleBack();
+		}
 	}
 	
 	// 切换全屏
