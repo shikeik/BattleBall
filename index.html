@@ -104,13 +104,23 @@
 				
 				// 工具栏
 				loading.registerTask('Toolbar', async () => {
-					await loader.loadBatch(SCRIPT_GROUPS.toolbar, (p, s) => loading.updateProgress(50 + p * 0.3, s));
-				}, 30);
+					await loader.loadBatch(SCRIPT_GROUPS.toolbar, (p, s) => loading.updateProgress(50 + p * 0.15, s));
+				}, 15);
 				
 				// WebGPU 演示
 				loading.registerTask('WebGPU Demo', async () => {
-					await loader.loadBatch(SCRIPT_GROUPS.webgpuDemo, (p, s) => loading.updateProgress(80 + p * 0.2, s));
-				}, 20);
+					await loader.loadBatch(SCRIPT_GROUPS.webgpuDemo, (p, s) => loading.updateProgress(65 + p * 0.1, s));
+				}, 10);
+				
+				// 场景管理系统
+				loading.registerTask('Scene System', async () => {
+					await loader.loadBatch(SCRIPT_GROUPS.scene, (p, s) => loading.updateProgress(75 + p * 0.1, s));
+				}, 10);
+				
+				// 游戏场景
+				loading.registerTask('Game Scenes', async () => {
+					await loader.loadBatch(SCRIPT_GROUPS.scenes, (p, s) => loading.updateProgress(85 + p * 0.15, s));
+				}, 15);
 				
 				// 4. 加载完成回调
 				loading.onComplete = () => {
@@ -124,11 +134,11 @@
 						window.toolbar = new Toolbar();
 					}
 					
-					// 初始化 WebGPU 演示
-					initWebGPUDemo();
+					// 初始化场景管理器
+					initSceneManager();
 					
 					if (window.logger) {
-						logger.log('system', 'Framework loaded, WebGPU demo ready');
+						logger.log('system', 'Framework loaded, scene system ready');
 					}
 				};
 				
@@ -141,46 +151,77 @@
 			}
 		}
 		
-		// WebGPU 演示初始化函数
-		async function initWebGPUDemo() {
+		// 场景管理器初始化函数
+		function initSceneManager() {
 			const canvas = document.getElementById('gameCanvas');
 			if (!canvas) {
-				if (window.logger) logger.log('WEBGPU', 'Canvas not found');
+				if (window.logger) logger.log('SCENE', 'Canvas not found');
 				return;
 			}
 			
 			// 设置 canvas 尺寸
-			canvas.width = Math.min(window.innerWidth, window.innerHeight) * 0.9;
-			canvas.height = canvas.width;
+			function resizeCanvas() {
+				const size = Math.min(window.innerWidth, window.innerHeight) * 0.9;
+				canvas.width = size;
+				canvas.height = size;
+			}
+			resizeCanvas();
+			window.addEventListener('resize', resizeCanvas);
 			
-			if (!window.WebGPUDemo) {
-				if (window.logger) logger.log('WEBGPU', 'WebGPUDemo class not loaded');
+			if (!window.SceneManager) {
+				if (window.logger) logger.log('SCENE', 'SceneManager not loaded');
 				return;
 			}
 			
-			try {
-				const demo = new WebGPUDemo(canvas);
-				await demo.init();
-				demo.start();
-				window.webgpuDemo = demo;
-				
-				// 添加工具栏按钮控制演示
-				if (window.toolbar) {
-					window.toolbar.addToolButton({
-						id: 'webgpuToggle',
-						icon: '■',
-						page: 0,
-						onClick: () => {
-							if (window.webgpuDemo) {
-								window.webgpuDemo.stop();
-								if (window.logger) logger.log('WEBGPU', 'Demo stopped by user');
-							}
+			// 创建场景管理器
+			const sceneManager = new SceneManager();
+			window.sceneManager = sceneManager;
+			
+			// 注册场景
+			sceneManager.register(MenuScene);
+			sceneManager.register(WebGPUScene);
+			sceneManager.register(SettingsScene);
+			
+			// 设置启动场景
+			sceneManager.setLaunchScene(MenuScene);
+			
+			// 添加工具栏按钮
+			if (window.toolbar) {
+				window.toolbar.addToolButton({
+					id: 'sceneInfo',
+					icon: '⊞',
+					page: 0,
+					onClick: () => {
+						if (window.sceneManager) {
+							const info = window.sceneManager.getStackInfo();
+							if (window.logger) logger.log('SCENE', `Stack: ${info}`);
 						}
-					});
-				}
-			} catch (e) {
-				if (window.logger) logger.log('WEBGPU', 'Failed to init demo', { error: e.message });
+					}
+				});
 			}
+			
+			// 主循环
+			let lastTime = performance.now();
+			function loop() {
+				const now = performance.now();
+				const delta = (now - lastTime) / 1000;
+				lastTime = now;
+				
+				sceneManager.render(delta);
+				requestAnimationFrame(loop);
+			}
+			loop();
+			
+			// 返回键处理
+			document.addEventListener('keydown', (e) => {
+				if (e.key === 'Escape' || e.key === 'Backspace') {
+					if (window.sceneManager && window.sceneManager.handleBack()) {
+						e.preventDefault();
+					}
+				}
+			});
+			
+			if (window.logger) logger.log('SCENE', 'Scene manager initialized');
 		}
 		
 		// 启动

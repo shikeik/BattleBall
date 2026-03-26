@@ -90,6 +90,19 @@ const SCRIPT_GROUPS = {
 	webgpuDemo: [
 		{ name: 'WebGPU Demo', src: 'js/webgpu-demo/webgpu-demo.js', weight: 1 },
 	],
+	
+	// 场景管理系统
+	scene: [
+		{ name: 'Scene Base', src: 'js/scene/scene.js', weight: 1 },
+		{ name: 'Scene Manager', src: 'js/scene/scene-manager.js', weight: 1 },
+	],
+	
+	// 游戏场景
+	scenes: [
+		{ name: 'Menu Scene', src: 'js/scenes/menu-scene.js', weight: 1 },
+		{ name: 'WebGPU Scene', src: 'js/scenes/webgpu-scene.js', weight: 1 },
+		{ name: 'Settings Scene', src: 'js/scenes/settings-scene.js', weight: 1 },
+	],
 };
 
 // 导出
