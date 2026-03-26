@@ -18,6 +18,12 @@ class WebGPUScreen extends Screen {
 		super.exit();
 		if (this.webgpuDemo) {
 			this.webgpuDemo.stop();
+			this.webgpuDemo = null;
+		}
+		// 移除 WebGPU Canvas
+		if (this.webgpuCanvas) {
+			this.webgpuCanvas.remove();
+			this.webgpuCanvas = null;
 		}
 	}
 
@@ -30,7 +36,20 @@ class WebGPUScreen extends Screen {
 				throw new Error('WebGPUDemo not loaded');
 			}
 
-			this.webgpuDemo = new WebGPUDemo(this.canvas);
+			// WebGPU 需要独立的 Canvas，不能和 2D 上下文混用
+			// 创建一个离屏 Canvas 用于 WebGPU 渲染
+			this.webgpuCanvas = document.createElement('canvas');
+			this.webgpuCanvas.width = this.canvas.width;
+			this.webgpuCanvas.height = this.canvas.height;
+			this.webgpuCanvas.style.position = 'absolute';
+			this.webgpuCanvas.style.left = '0';
+			this.webgpuCanvas.style.top = '0';
+			this.webgpuCanvas.style.width = '100vw';
+			this.webgpuCanvas.style.height = '100vh';
+			this.webgpuCanvas.style.zIndex = '1';
+			document.body.appendChild(this.webgpuCanvas);
+
+			this.webgpuDemo = new WebGPUDemo(this.webgpuCanvas);
 			await this.webgpuDemo.init();
 			this.webgpuDemo.start();
 
@@ -38,6 +57,11 @@ class WebGPUScreen extends Screen {
 		} catch (e) {
 			this.error = e.message;
 			if (window.logger) logger.log('WEBGPU_SCREEN', 'Failed to init', { error: e.message });
+			// 清理
+			if (this.webgpuCanvas) {
+				this.webgpuCanvas.remove();
+				this.webgpuCanvas = null;
+			}
 		} finally {
 			this.initializing = false;
 		}

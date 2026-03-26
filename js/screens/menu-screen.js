@@ -18,17 +18,30 @@ class GameScreen extends Screen {
 		if (!this.canvas) return;
 		const ctx = this.canvas.getContext('2d');
 		if (!ctx) return;
+		
+		const viewport = this.getViewport();
+		if (!viewport) return;
+		
+		// 应用视口变换
+		viewport.apply(ctx);
+		viewport.beginWorldRender(ctx);
+		
+		const w = viewport.worldWidth;
+		const h = viewport.worldHeight;
+
 		ctx.fillStyle = '#0a0a1a';
-		ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+		ctx.fillRect(0, 0, w, h);
 
 		ctx.fillStyle = '#fff';
 		ctx.font = '24px sans-serif';
 		ctx.textAlign = 'center';
-		ctx.fillText('游戏界面（占位符）', this.canvas.width / 2, this.canvas.height / 2);
+		ctx.fillText('游戏界面（占位符）', w / 2, h / 2);
 
 		ctx.font = '14px sans-serif';
 		ctx.fillStyle = '#666';
-		ctx.fillText('ESC 返回主菜单', this.canvas.width / 2, this.canvas.height - 30);
+		ctx.fillText('ESC 返回主菜单', w / 2, h - 30);
+		
+		viewport.endWorldRender(ctx);
 	}
 
 	handleBack() {
