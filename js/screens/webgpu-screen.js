@@ -1,7 +1,7 @@
 /**
- * WebGPUScene - WebGPU 演示场景
+ * WebGPUScreen - WebGPU 演示界面
  */
-class WebGPUScene extends Scene {
+class WebGPUScreen extends Screen {
 	init() {
 		this.canvas = document.getElementById('gameCanvas');
 		this.webgpuDemo = null;
@@ -34,10 +34,10 @@ class WebGPUScene extends Scene {
 			await this.webgpuDemo.init();
 			this.webgpuDemo.start();
 
-			if (window.logger) logger.log('WEBGPU_SCENE', 'WebGPU demo started');
+			if (window.logger) logger.log('WEBGPU_SCREEN', 'WebGPU demo started');
 		} catch (e) {
 			this.error = e.message;
-			if (window.logger) logger.log('WEBGPU_SCENE', 'Failed to init', { error: e.message });
+			if (window.logger) logger.log('WEBGPU_SCREEN', 'Failed to init', { error: e.message });
 		} finally {
 			this.initializing = false;
 		}
@@ -114,9 +114,9 @@ class WebGPUScene extends Scene {
 	}
 
 	handleBack() {
-		this.sceneManager.popScene();
+		this.screenManager.popScreen();
 		return true;
 	}
 }
 
-window.WebGPUScene = WebGPUScene;
+window.WebGPUScreen = WebGPUScreen;

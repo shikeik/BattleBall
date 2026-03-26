@@ -112,14 +112,14 @@
 					await loader.loadBatch(SCRIPT_GROUPS.webgpuDemo, (p, s) => loading.updateProgress(65 + p * 0.1, s));
 				}, 10);
 				
-				// 场景管理系统
-				loading.registerTask('Scene System', async () => {
-					await loader.loadBatch(SCRIPT_GROUPS.scene, (p, s) => loading.updateProgress(75 + p * 0.1, s));
+				// 屏幕管理系统
+				loading.registerTask('Screen System', async () => {
+					await loader.loadBatch(SCRIPT_GROUPS.screen, (p, s) => loading.updateProgress(75 + p * 0.1, s));
 				}, 10);
 				
-				// 游戏场景
-				loading.registerTask('Game Scenes', async () => {
-					await loader.loadBatch(SCRIPT_GROUPS.scenes, (p, s) => loading.updateProgress(85 + p * 0.15, s));
+				// 游戏屏幕
+				loading.registerTask('Game Screens', async () => {
+					await loader.loadBatch(SCRIPT_GROUPS.screens, (p, s) => loading.updateProgress(85 + p * 0.15, s));
 				}, 15);
 				
 				// 4. 加载完成回调
@@ -135,11 +135,11 @@
 							window.toolbar = new Toolbar();
 						}
 						
-						// 初始化场景管理器
-						initSceneManager();
+						// 初始化屏幕管理器
+						initScreenManager();
 						
 						if (window.logger) {
-							logger.log('system', 'Framework loaded, scene system ready');
+							logger.log('system', 'Framework loaded, screen system ready');
 						}
 					} catch (e) {
 						document.body.innerHTML = '<pre style="color:red;padding:20px;font-size:14px;">onComplete Error: ' + e.message + '\n\nStack: ' + e.stack + '</pre>';
@@ -160,10 +160,10 @@
 		}
 		
 		// 场景管理器初始化函数
-		function initSceneManager() { try {
+		function initScreenManager() { try {
 			const canvas = document.getElementById('gameCanvas');
 			if (!canvas) {
-				if (window.logger) logger.log('SCENE', 'Canvas not found');
+				if (window.logger) logger.log('SCREEN', 'Canvas not found');
 				return;
 			}
 			
@@ -178,33 +178,33 @@
 			resizeCanvas();
 			window.addEventListener('resize', resizeCanvas);
 			
-			if (!window.SceneManager) {
-				if (window.logger) logger.log('SCENE', 'SceneManager not loaded');
+			if (!window.ScreenManager) {
+				if (window.logger) logger.log('SCREEN', 'ScreenManager not loaded');
 				return;
 			}
 			
-			// 创建场景管理器
-			const sceneManager = new SceneManager();
-			window.sceneManager = sceneManager;
+			// 创建屏幕管理器
+			const screenManager = new ScreenManager();
+			window.screenManager = screenManager;
 			
-			// 注册场景
-			sceneManager.register(MenuScene);
-			sceneManager.register(WebGPUScene);
-			sceneManager.register(SettingsScene);
+			// 注册屏幕
+			screenManager.register(MenuScreen);
+			screenManager.register(WebGPUScreen);
+			screenManager.register(SettingsScreen);
 			
-			// 设置启动场景
-			sceneManager.setLaunchScene(MenuScene);
+			// 设置启动屏幕
+			screenManager.setLaunchScreen(MenuScreen);
 			
 			// 添加工具栏按钮
 			if (window.toolbar) {
 				window.toolbar.addToolButton({
-					id: 'sceneInfo',
+					id: 'screenInfo',
 					icon: '⊞',
 					page: 0,
 					onClick: () => {
-						if (window.sceneManager) {
-							const info = window.sceneManager.getStackInfo();
-							if (window.logger) logger.log('SCENE', `Stack: ${info}`);
+						if (window.screenManager) {
+							const info = window.screenManager.getStackInfo();
+							if (window.logger) logger.log('SCREEN', `Stack: ${info}`);
 						}
 					}
 				});
@@ -217,7 +217,7 @@
 				const delta = (now - lastTime) / 1000;
 				lastTime = now;
 				
-				sceneManager.render(delta);
+				screenManager.render(delta);
 				requestAnimationFrame(loop);
 			}
 			loop();
@@ -225,13 +225,13 @@
 			// 返回键处理
 			document.addEventListener('keydown', (e) => {
 				if (e.key === 'Escape' || e.key === 'Backspace') {
-					if (window.sceneManager && window.sceneManager.handleBack()) {
+					if (window.screenManager && window.screenManager.handleBack()) {
 						e.preventDefault();
 					}
 				}
 			});
 			
-			if (window.logger) logger.log('SCENE', 'Scene manager initialized');
+			if (window.logger) logger.log('SCREEN', 'Screen manager initialized');
 			} catch (e) {
 				document.body.innerHTML = '<pre style="color:red;padding:20px;font-size:14px;">Error: ' + e.message + '\n\nStack: ' + e.stack + '</pre>';
 				throw e;

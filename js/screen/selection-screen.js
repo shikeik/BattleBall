@@ -1,10 +1,10 @@
 /**
- * SelectionScene - 选择屏基类
+ * SelectionScreen - 选择屏基类
  * 原版逻辑：使用 Map 映射，null 值作为分隔线，全部触发 replace
  */
-class SelectionScene extends Scene {
-	constructor(sceneManager) {
-		super(sceneManager);
+class SelectionScreen extends Screen {
+	constructor(screenManager) {
+		super(screenManager);
 		this.screenMapping = new Map();
 		this.canvas = null;
 		this.hoveredIndex = -1;
@@ -18,7 +18,7 @@ class SelectionScene extends Scene {
 		// 检查 mapping 中的值
 		for (const [key, value] of this.screenMapping) {
 			if (value !== null && typeof value !== 'function') {
-				console.error(`Invalid scene class for "${key}":`, value, typeof value);
+				console.error(`Invalid screen class for "${key}":`, value, typeof value);
 			}
 		}
 	}
@@ -26,9 +26,9 @@ class SelectionScene extends Scene {
 	/**
 	 * 子类必须实现：填充屏幕映射
 	 * 使用示例：
-	 *   map.set('开始游戏', GameScene);
+	 *   map.set('开始游戏', GameScreen);
 	 *   map.set('分隔标题', null);  // null 作为分隔线
-	 *   map.set('设置', SettingsScene);
+	 *   map.set('设置', SettingsScreen);
 	 */
 	initScreenMapping(map) {
 		// 子类实现
@@ -70,8 +70,8 @@ class SelectionScene extends Scene {
 		let currentY = startY;
 		let btnIndex = 0;
 
-		for (const [title, sceneClass] of this.screenMapping) {
-			if (sceneClass === null) {
+		for (const [title, screenClass] of this.screenMapping) {
+			if (screenClass === null) {
 				// 分隔线/标签
 				ctx.fillStyle = '#0ff';
 				ctx.font = '16px sans-serif';
@@ -106,7 +106,7 @@ class SelectionScene extends Scene {
 					y: currentY,
 					w: btnW,
 					h: btnH,
-					sceneClass
+					screenClass
 				});
 
 				btnIndex++;
@@ -117,21 +117,21 @@ class SelectionScene extends Scene {
 
 	/**
 	 * 屏幕选择回调（子类可重写拦截）
-	 * 默认行为：replaceScene
+	 * 默认行为：replaceScreen
 	 */
-	onScreenSelected(sceneClass) {
+	onScreenSelected(screenClass) {
 		if (window.logger) {
 			logger.log('SELECT', 'onScreenSelected called');
-			logger.log('SELECT', 'sceneClass: ' + sceneClass.name);
+			logger.log('SELECT', 'screenClass: ' + screenClass.name);
 			logger.log('SELECT', 'this: ' + this.constructor.name);
-			logger.log('SELECT', 'this.sceneManager type: ' + typeof this.sceneManager);
-			logger.log('SELECT', 'this.sceneManager constructor: ' + (this.sceneManager ? this.sceneManager.constructor.name : 'null'));
-			logger.log('SELECT', 'has replaceScene: ' + (this.sceneManager && this.sceneManager.replaceScene ? 'YES' : 'NO'));
+			logger.log('SELECT', 'this.screenManager type: ' + typeof this.screenManager);
+			logger.log('SELECT', 'this.screenManager constructor: ' + (this.screenManager ? this.screenManager.constructor.name : 'null'));
+			logger.log('SELECT', 'has replaceScreen: ' + (this.screenManager && this.screenManager.replaceScreen ? 'YES' : 'NO'));
 		}
-		if (this.sceneManager && this.sceneManager.replaceScene) {
-			this.sceneManager.replaceScene(sceneClass);
+		if (this.screenManager && this.screenManager.replaceScreen) {
+			this.screenManager.replaceScreen(screenClass);
 		} else {
-			if (window.logger) logger.log('ERROR', 'sceneManager.replaceScene not available');
+			if (window.logger) logger.log('ERROR', 'screenManager.replaceScreen not available');
 		}
 	}
 
@@ -179,9 +179,9 @@ class SelectionScene extends Scene {
 			console.log('Click at', pos, 'hit index', index, 'buttons', this.buttons.length);
 			if (index >= 0) {
 				const btn = this.buttons[index];
-				console.log('Selected:', btn.sceneClass.name);
-				if (window.logger) logger.log('SELECT', `Selected: ${btn.sceneClass.name}`);
-				this.onScreenSelected(btn.sceneClass);
+				console.log('Selected:', btn.screenClass.name);
+				if (window.logger) logger.log('SELECT', `Selected: ${btn.screenClass.name}`);
+				this.onScreenSelected(btn.screenClass);
 			}
 		};
 
@@ -199,9 +199,9 @@ class SelectionScene extends Scene {
 			console.log('TouchEnd, hoveredIndex:', this.hoveredIndex);
 			if (this.hoveredIndex >= 0) {
 				const btn = this.buttons[this.hoveredIndex];
-				console.log('Touch selected:', btn.sceneClass.name);
-				if (window.logger) logger.log('SELECT', `Selected: ${btn.sceneClass.name}`);
-				this.onScreenSelected(btn.sceneClass);
+				console.log('Touch selected:', btn.screenClass.name);
+				if (window.logger) logger.log('SELECT', `Selected: ${btn.screenClass.name}`);
+				this.onScreenSelected(btn.screenClass);
 				this.hoveredIndex = -1;
 			}
 		};
@@ -222,4 +222,4 @@ class SelectionScene extends Scene {
 	}
 }
 
-window.SelectionScene = SelectionScene;
+window.SelectionScreen = SelectionScreen;

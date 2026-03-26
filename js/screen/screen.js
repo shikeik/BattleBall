@@ -1,10 +1,10 @@
 /**
- * Scene 基类
+ * Screen 基类
  * 库层只提供 render 方法，业务层自行决定逻辑/渲染分离
  */
-class Scene {
-	constructor(sceneManager) {
-		this.sceneManager = sceneManager;
+class Screen {
+	constructor(screenManager) {
+		this.screenManager = screenManager;
 		this.initialized = false;
 		this.visible = false;
 	}
@@ -16,7 +16,7 @@ class Scene {
 		if (this.initialized) return;
 		this.init();
 		this.initialized = true;
-		if (window.logger) logger.log('SCENE', `${this.constructor.name} initialized`);
+		if (window.logger) logger.log('SCREEN', `${this.constructor.name} initialized`);
 	}
 
 	/**
@@ -27,19 +27,19 @@ class Scene {
 	}
 
 	/**
-	 * 进入场景
+	 * 进入屏幕
 	 */
 	enter() {
 		this.visible = true;
-		if (window.logger) logger.log('SCENE', `${this.constructor.name} enter`);
+		if (window.logger) logger.log('SCREEN', `${this.constructor.name} enter`);
 	}
 
 	/**
-	 * 离开场景
+	 * 离开屏幕
 	 */
 	exit() {
 		this.visible = false;
-		if (window.logger) logger.log('SCENE', `${this.constructor.name} exit`);
+		if (window.logger) logger.log('SCREEN', `${this.constructor.name} exit`);
 	}
 
 	/**
@@ -60,12 +60,12 @@ class Scene {
 	}
 
 	/**
-	 * 销毁场景
+	 * 销毁屏幕
 	 */
 	destroy() {
 		this.initialized = false;
-		if (window.logger) logger.log('SCENE', `${this.constructor.name} destroyed`);
+		if (window.logger) logger.log('SCREEN', `${this.constructor.name} destroyed`);
 	}
 }
 
-window.Scene = Scene;
+window.Screen = Screen;

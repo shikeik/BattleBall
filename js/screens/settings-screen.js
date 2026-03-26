@@ -1,7 +1,7 @@
 /**
- * SettingsScene - 设置场景
+ * SettingsScreen - 设置界面
  */
-class SettingsScene extends Scene {
+class SettingsScreen extends Screen {
 	init() {
 		this.canvas = document.getElementById('gameCanvas');
 		this.settings = [
@@ -129,7 +129,7 @@ class SettingsScene extends Scene {
 	}
 
 	handleBack() {
-		this.sceneManager.popScene();
+		this.screenManager.popScreen();
 		return true;
 	}
 
@@ -191,4 +191,4 @@ class SettingsScene extends Scene {
 	}
 }
 
-window.SettingsScene = SettingsScene;
+window.SettingsScreen = SettingsScreen;

@@ -1,13 +1,13 @@
 /**
- * SceneManager 场景管理器
- * 管理场景生命周期、导航栈、转场效果
+ * ScreenManager 屏幕管理器
+ * 管理屏幕生命周期、导航栈、转场效果
  */
-class SceneManager {
+class ScreenManager {
 	constructor() {
-		this.scenes = new Map();
-		this.sceneStack = [];
-		this.currentScene = null;
-		this.launchScene = null;
+		this.screens = new Map();
+		this.screenStack = [];
+		this.currentScreen = null;
+		this.launchScreen = null;
 		this.popping = false;
 
 		// 转场状态
@@ -25,133 +25,133 @@ class SceneManager {
 	}
 
 	/**
-	 * 注册场景
+	 * 注册屏幕
 	 */
-	register(sceneClass, instance) {
-		if (this.scenes.has(sceneClass)) {
-			if (window.logger) logger.log('SCENE_MGR', `${sceneClass.name} already registered`);
+	register(screenClass, instance) {
+		if (this.screens.has(screenClass)) {
+			if (window.logger) logger.log('SCREEN_MGR', `${screenClass.name} already registered`);
 			return this;
 		}
 		if (!instance) {
-			instance = new sceneClass(this);
+			instance = new screenClass(this);
 		}
-		instance.sceneManager = this;
-		this.scenes.set(sceneClass, instance);
-		if (window.logger) logger.log('SCENE_MGR', `Registered ${sceneClass.name}`);
+		instance.screenManager = this;
+		this.screens.set(screenClass, instance);
+		if (window.logger) logger.log('SCREEN_MGR', `Registered ${screenClass.name}`);
 		return this;
 	}
 
 	/**
-	 * 设置启动场景
+	 * 设置启动屏幕
 	 */
-	setLaunchScene(sceneClass) {
-		this.launchScene = sceneClass;
-		this.goScene(sceneClass);
+	setLaunchScreen(screenClass) {
+		this.launchScreen = screenClass;
+		this.goScreen(screenClass);
 		return this;
 	}
 
 	/**
-	 * 进入场景（入栈，可返回）
+	 * 进入屏幕（入栈，可返回）
 	 */
-	goScene(sceneClass) {
-		console.log('goScene:', sceneClass.name);
-		const next = this._getOrCreate(sceneClass);
+	goScreen(screenClass) {
+		console.log('goScreen:', screenClass.name);
+		const next = this._getOrCreate(screenClass);
 		console.log('got instance:', next.constructor.name);
 
-		// 相同场景忽略
-		if (this.currentScene === next) {
-			console.log('same scene, ignoring');
+		// 相同屏幕忽略
+		if (this.currentScreen === next) {
+			console.log('same screen, ignoring');
 			return this;
 		}
 
-		this._initializeScene(next);
+		this._initializeScreen(next);
 
 		// 隐藏当前并入栈
-		if (this.currentScene) {
-			this.currentScene.exit();
+		if (this.currentScreen) {
+			this.currentScreen.exit();
 			if (!this.popping) {
-				this.sceneStack.push(this.currentScene);
+				this.screenStack.push(this.currentScreen);
 			}
 		}
 
-		this.currentScene = next;
-		this.currentScene.enter();
+		this.currentScreen = next;
+		this.currentScreen.enter();
 
-		if (window.logger) logger.log('SCENE_MGR', `Go scene: ${next.constructor.name}, stack: [${this.getStackInfo()}]`);
+		if (window.logger) logger.log('SCREEN_MGR', `Go screen: ${next.constructor.name}, stack: [${this.getStackInfo()}]`);
 		return this;
 	}
 
 	/**
-	 * 仅显示场景（不入栈）
+	 * 仅显示屏幕（不入栈）
 	 */
-	showScene(sceneClass) {
-		const next = this._getOrCreate(sceneClass);
-		if (this.currentScene === next) return this;
+	showScreen(screenClass) {
+		const next = this._getOrCreate(screenClass);
+		if (this.currentScreen === next) return this;
 
-		this._initializeScene(next);
+		this._initializeScreen(next);
 
-		if (this.currentScene) {
-			this.currentScene.exit();
+		if (this.currentScreen) {
+			this.currentScreen.exit();
 			// 不入栈
 		}
 
-		this.currentScene = next;
-		this.currentScene.enter();
+		this.currentScreen = next;
+		this.currentScreen.enter();
 
-		if (window.logger) logger.log('SCENE_MGR', `Show scene: ${next.constructor.name}`);
+		if (window.logger) logger.log('SCREEN_MGR', `Show screen: ${next.constructor.name}`);
 		return this;
 	}
 
 	/**
-	 * 替换场景（重新创建）
+	 * 替换屏幕（重新创建）
 	 */
-	replaceScene(sceneClass) {
-		console.log('replaceScene:', sceneClass.name);
+	replaceScreen(screenClass) {
+		console.log('replaceScreen:', screenClass.name);
 		// 移除旧实例
-		if (this.scenes.has(sceneClass)) {
-			const old = this.scenes.get(sceneClass);
+		if (this.screens.has(screenClass)) {
+			const old = this.screens.get(screenClass);
 			old.destroy();
-			this.scenes.delete(sceneClass);
+			this.screens.delete(screenClass);
 		}
-		return this.goScene(sceneClass);
+		return this.goScreen(screenClass);
 	}
 
 	/**
-	 * 返回上个场景
+	 * 返回上个屏幕
 	 */
-	popScene() {
-		if (this.sceneStack.length === 0) {
-			if (window.logger) logger.log('SCENE_MGR', 'Pop failed: stack empty');
+	popScreen() {
+		if (this.screenStack.length === 0) {
+			if (window.logger) logger.log('SCREEN_MGR', 'Pop failed: stack empty');
 			return false;
 		}
 
-		const prev = this.sceneStack.pop();
+		const prev = this.screenStack.pop();
 		this.popping = true;
 
-		if (this.currentScene) {
-			this.currentScene.exit();
+		if (this.currentScreen) {
+			this.currentScreen.exit();
 		}
 
-		this.currentScene = prev;
-		this.currentScene.enter();
+		this.currentScreen = prev;
+		this.currentScreen.enter();
 
 		this.popping = false;
 
-		if (window.logger) logger.log('SCENE_MGR', `Pop to: ${prev.constructor.name}, stack: [${this.getStackInfo()}]`);
+		if (window.logger) logger.log('SCREEN_MGR', `Pop to: ${prev.constructor.name}, stack: [${this.getStackInfo()}]`);
 		return true;
 	}
 
 	/**
-	 * 回退到指定类型的场景
+	 * 回退到指定类型的屏幕
 	 */
 	popTo(targetClass) {
-		if (this.currentScene && this.currentScene.constructor === targetClass) {
+		if (this.currentScreen && this.currentScreen.constructor === targetClass) {
 			return true;
 		}
 
 		let targetIndex = -1;
-		for (let i = this.sceneStack.length - 1; i >= 0; i--) {
-			if (this.sceneStack[i].constructor === targetClass) {
+		for (let i = this.screenStack.length - 1; i >= 0; i--) {
+			if (this.screenStack[i].constructor === targetClass) {
 				targetIndex = i;
 				break;
 			}
@@ -159,35 +159,35 @@ class SceneManager {
 
 		if (targetIndex === -1) return false;
 
-		while (this.sceneStack.length > targetIndex + 1) {
-			this.sceneStack.pop();
+		while (this.screenStack.length > targetIndex + 1) {
+			this.screenStack.pop();
 		}
 
-		return this.popScene();
+		return this.popScreen();
 	}
 
 	/**
 	 * 清空导航栈
 	 */
 	clearStack() {
-		this.sceneStack.length = 0;
-		if (window.logger) logger.log('SCENE_MGR', 'Stack cleared');
+		this.screenStack.length = 0;
+		if (window.logger) logger.log('SCREEN_MGR', 'Stack cleared');
 	}
 
 	/**
-	 * 获取当前场景
+	 * 获取当前屏幕
 	 */
-	getCurrentScene() {
-		return this.currentScene;
+	getCurrentScreen() {
+		return this.currentScreen;
 	}
 
 	/**
 	 * 获取导航栈信息
 	 */
 	getStackInfo() {
-		const stack = this.sceneStack.map(s => s.constructor.name);
-		if (this.currentScene) {
-			stack.push(this.currentScene.constructor.name);
+		const stack = this.screenStack.map(s => s.constructor.name);
+		if (this.currentScreen) {
+			stack.push(this.currentScreen.constructor.name);
 		}
 		return stack.join(' -> ');
 	}
@@ -203,7 +203,7 @@ class SceneManager {
 		this.onTransitionMiddle = onMiddle;
 		this.onTransitionEnd = onEnd;
 
-		if (window.logger) logger.log('SCENE_MGR', 'Transition start');
+		if (window.logger) logger.log('SCREEN_MGR', 'Transition start');
 	}
 
 	/**
@@ -253,9 +253,9 @@ class SceneManager {
 		// 转场更新
 		this._updateTransition(delta);
 
-		// 渲染当前场景
-		if (this.currentScene && this.currentScene.visible) {
-			this.currentScene.render(delta);
+		// 渲染当前屏幕
+		if (this.currentScreen && this.currentScreen.visible) {
+			this.currentScreen.render(delta);
 		}
 
 		// 渲染转场覆盖层
@@ -268,31 +268,31 @@ class SceneManager {
 	handleBack() {
 		if (this.isTransitioning()) return true;
 
-		if (this.currentScene && this.currentScene.handleBack()) {
+		if (this.currentScreen && this.currentScreen.handleBack()) {
 			return true;
 		}
 
-		return this.popScene();
+		return this.popScreen();
 	}
 
 	// ---------- 私有方法 ----------
 
-	_getOrCreate(sceneClass) {
-		if (!this.scenes.has(sceneClass)) {
-			if (typeof sceneClass !== 'function') {
-				throw new Error(`sceneClass is not a constructor: ${sceneClass} (type: ${typeof sceneClass})`);
+	_getOrCreate(screenClass) {
+		if (!this.screens.has(screenClass)) {
+			if (typeof screenClass !== 'function') {
+				throw new Error(`screenClass is not a constructor: ${screenClass} (type: ${typeof screenClass})`);
 			}
-			const instance = new sceneClass(this);
-			this.scenes.set(sceneClass, instance);
-			instance.sceneManager = this;
-			if (window.logger) logger.log('SCENE_MGR', `Created ${sceneClass.name}`);
+			const instance = new screenClass(this);
+			this.screens.set(screenClass, instance);
+			instance.screenManager = this;
+			if (window.logger) logger.log('SCREEN_MGR', `Created ${screenClass.name}`);
 		}
-		return this.scenes.get(sceneClass);
+		return this.screens.get(screenClass);
 	}
 
-	_initializeScene(scene) {
-		if (!scene.initialized) {
-			scene.initialize();
+	_initializeScreen(screen) {
+		if (!screen.initialized) {
+			screen.initialize();
 		}
 	}
 
@@ -375,4 +375,4 @@ class SceneManager {
 	}
 }
 
-window.SceneManager = SceneManager;
+window.ScreenManager = ScreenManager;
