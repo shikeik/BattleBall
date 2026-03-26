@@ -227,7 +227,7 @@ class LoggerUI {
 		const url = URL.createObjectURL(blob);
 		const a = document.createElement('a');
 		a.href = url;
-		a.download = `game-log-${new Date().toISOString().slice(0, 19).replace(/:/g, '-')}.txt`;
+		a.download = `game-log-${new Date().toISOString().slice(0, 19).replace(/:/g, '-')}.log`;
 		document.body.appendChild(a);
 		a.click();
 		document.body.removeChild(a);
