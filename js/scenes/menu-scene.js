@@ -1,37 +1,40 @@
 /**
  * MenuScene - 主菜单场景
- * 使用 SelectionScene 基类快速构建
+ * 原版用法：填充 screenMapping，null 作为分隔线
  */
 class MenuScene extends SelectionScene {
-	initSelectionItems() {
-		this.title = 'BATTLE BALL';
-
-		this.addItem('开始游戏', () => {
-			this.sceneManager.playTransition(() => {
-				// TODO: 跳转到游戏场景
-				if (window.logger) logger.log('MENU', 'Start game (placeholder)');
-			});
-		});
-
-		this.addItem('WebGPU 演示', () => {
-			this.sceneManager.playTransition(() => {
-				this.goScene(WebGPUScene);
-			});
-		});
-
-		this.addItem('设置', () => {
-			this.goScene(SettingsScene);
-		});
+	initScreenMapping(map) {
+		map.set('开始游戏', GameScene);
+		map.set('WebGPU 演示', WebGPUScene);
+		map.set('其他', null); // 分隔线
+		map.set('设置', SettingsScene);
 	}
+}
 
-	getFooterHint() {
-		return '选择模式开始 | ESC 返回';
+// 占位符游戏场景，后续实现
+class GameScene extends Scene {
+	render(delta) {
+		if (!this.canvas) return;
+		const ctx = this.canvas.getContext('2d');
+		if (!ctx) return;
+		ctx.fillStyle = '#0a0a1a';
+		ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+
+		ctx.fillStyle = '#fff';
+		ctx.font = '24px sans-serif';
+		ctx.textAlign = 'center';
+		ctx.fillText('游戏场景（占位符）', this.canvas.width / 2, this.canvas.height / 2);
+
+		ctx.font = '14px sans-serif';
+		ctx.fillStyle = '#666';
+		ctx.fillText('ESC 返回主菜单', this.canvas.width / 2, this.canvas.height - 30);
 	}
 
 	handleBack() {
-		// 主菜单不处理返回，让系统处理（退出）
-		return false;
+		this.sceneManager.replaceScreen(MenuScene);
+		return true;
 	}
 }
 
 window.MenuScene = MenuScene;
+window.GameScene = GameScene;

@@ -1,58 +1,30 @@
 /**
  * SelectionScene - 选择屏基类
- * 用于快速创建菜单、选择界面
- * 子类只需实现 initSelectionItems() 方法定义选项
+ * 原版逻辑：使用 Map 映射，null 值作为分隔线，全部触发 replace
  */
 class SelectionScene extends Scene {
 	constructor(sceneManager) {
 		super(sceneManager);
-		this.items = [];
-		this.hoveredIndex = -1;
-		this.title = '';
+		this.screenMapping = new Map();
 		this.canvas = null;
-		this.ctx = null;
+		this.hoveredIndex = -1;
+		this.buttons = []; // 只存储实际按钮（排除分隔线）
 	}
 
 	init() {
 		this.canvas = document.getElementById('gameCanvas');
-		this.initSelectionItems();
+		this.initScreenMapping(this.screenMapping);
 	}
 
 	/**
-	 * 子类必须实现：初始化选项列表
-	 * 示例：
-	 *   this.title = '主菜单';
-	 *   this.addItem('开始游戏', () => this.goScene(GameScene));
-	 *   this.addItem('设置', () => this.goScene(SettingsScene));
+	 * 子类必须实现：填充屏幕映射
+	 * 使用示例：
+	 *   map.set('开始游戏', GameScene);
+	 *   map.set('分隔标题', null);  // null 作为分隔线
+	 *   map.set('设置', SettingsScene);
 	 */
-	initSelectionItems() {
+	initScreenMapping(map) {
 		// 子类实现
-	}
-
-	/**
-	 * 添加选项
-	 * @param {string} label - 显示文本
-	 * @param {Function} callback - 点击回调
-	 * @param {Object} options - 选项配置
-	 */
-	addItem(label, callback, options = {}) {
-		this.items.push({
-			label,
-			callback,
-			enabled: options.enabled !== false,
-			color: options.color || null,
-			subtitle: options.subtitle || null
-		});
-	}
-
-	/**
-	 * 添加分隔线/分组标题
-	 */
-	addSeparator(text) {
-		this.items.push({
-			isSeparator: true,
-			label: text || ''
-		});
 	}
 
 	enter() {
@@ -67,157 +39,81 @@ class SelectionScene extends Scene {
 
 	render(delta) {
 		if (!this.canvas) return;
-		this.ctx = this.canvas.getContext('2d');
-		if (!this.ctx) return;
+		const ctx = this.canvas.getContext('2d');
+		if (!ctx) return;
 
 		const w = this.canvas.width;
 		const h = this.canvas.height;
 
 		// 背景
-		this._drawBackground(w, h);
+		ctx.fillStyle = '#1a1a2e';
+		ctx.fillRect(0, 0, w, h);
 
-		// 标题
-		if (this.title) {
-			this._drawTitle(w, h);
-		}
-
-		// 选项列表
-		this._drawItems(w, h);
-
-		// 底部提示
-		this._drawFooter(w, h);
+		// 绘制按钮列表
+		this._drawButtons(ctx, w, h);
 	}
 
-	_drawBackground(w, h) {
-		this.ctx.fillStyle = '#1a1a2e';
-		this.ctx.fillRect(0, 0, w, h);
-	}
+	_drawButtons(ctx, w, h) {
+		const btnH = 60;
+		const btnW = 280;
+		const margin = 20;
+		const startY = h * 0.2;
 
-	_drawTitle(w, h) {
-		this.ctx.fillStyle = '#eee';
-		this.ctx.font = 'bold 36px sans-serif';
-		this.ctx.textAlign = 'center';
-		this.ctx.fillText(this.title, w / 2, h * 0.15);
-	}
-
-	_drawItems(w, h) {
-		const itemH = 50;
-		const itemW = Math.min(300, w - 40);
-		const startY = this.title ? h * 0.25 : h * 0.15;
-		const gap = 15;
-
-		this.itemLayout = [];
-
+		this.buttons = []; // 清空按钮列表
 		let currentY = startY;
-		this.items.forEach((item, i) => {
-			if (item.isSeparator) {
-				// 分隔线
-				if (item.label) {
-					this.ctx.fillStyle = '#888';
-					this.ctx.font = '14px sans-serif';
-					this.ctx.textAlign = 'center';
-					this.ctx.fillText(item.label, w / 2, currentY + 10);
-					currentY += 25;
-				} else {
-					this.ctx.strokeStyle = '#333';
-					this.ctx.lineWidth = 1;
-					this.ctx.beginPath();
-					this.ctx.moveTo(w * 0.2, currentY);
-					this.ctx.lineTo(w * 0.8, currentY);
-					this.ctx.stroke();
-					currentY += 20;
-				}
+		let btnIndex = 0;
+
+		for (const [title, sceneClass] of this.screenMapping) {
+			if (sceneClass === null) {
+				// 分隔线/标签
+				ctx.fillStyle = '#0ff';
+				ctx.font = '16px sans-serif';
+				ctx.textAlign = 'center';
+				ctx.fillText(title, w / 2, currentY + 10);
+				currentY += 30;
 			} else {
 				// 按钮
-				const x = (w - itemW) / 2;
-				const isHovered = i === this.hoveredIndex;
-				const isEnabled = item.enabled;
+				const x = (w - btnW) / 2;
+				const isHovered = btnIndex === this.hoveredIndex;
 
 				// 背景
-				if (isEnabled) {
-					this.ctx.fillStyle = isHovered ? '#4a9eff' : '#16213e';
-				} else {
-					this.ctx.fillStyle = '#222';
-				}
-				this.ctx.fillRect(x, currentY, itemW, itemH);
+				ctx.fillStyle = isHovered ? '#4a9eff' : '#16213e';
+				ctx.fillRect(x, currentY, btnW, btnH);
 
 				// 边框
-				if (isEnabled) {
-					this.ctx.strokeStyle = isHovered ? '#7ec8ff' : (item.color || '#0f3460');
-				} else {
-					this.ctx.strokeStyle = '#333';
-				}
-				this.ctx.lineWidth = 2;
-				this.ctx.strokeRect(x, currentY, itemW, itemH);
+				ctx.strokeStyle = isHovered ? '#7ec8ff' : '#0f3460';
+				ctx.lineWidth = 2;
+				ctx.strokeRect(x, currentY, btnW, btnH);
 
 				// 文字
-				if (isEnabled) {
-					this.ctx.fillStyle = isHovered ? '#fff' : '#aaa';
-				} else {
-					this.ctx.fillStyle = '#555';
-				}
-				this.ctx.font = '18px sans-serif';
-				this.ctx.textAlign = 'center';
-				this.ctx.textBaseline = 'middle';
-				this.ctx.fillText(item.label, w / 2, currentY + itemH / 2);
+				ctx.fillStyle = isHovered ? '#fff' : '#aaa';
+				ctx.font = '20px sans-serif';
+				ctx.textAlign = 'center';
+				ctx.textBaseline = 'middle';
+				ctx.fillText(title, w / 2, currentY + btnH / 2);
 
-				// 副标题
-				if (item.subtitle) {
-					this.ctx.fillStyle = '#666';
-					this.ctx.font = '12px sans-serif';
-					this.ctx.fillText(item.subtitle, w / 2, currentY + itemH + 12);
-					currentY += 15;
-				}
-
-				// 记录布局信息用于点击检测
-				this.itemLayout.push({
-					index: i,
-					x: x,
+				// 记录按钮信息
+				this.buttons.push({
+					index: btnIndex,
+					x,
 					y: currentY,
-					w: itemW,
-					h: itemH,
-					enabled: isEnabled
+					w: btnW,
+					h: btnH,
+					sceneClass
 				});
 
-				currentY += itemH + gap;
+				btnIndex++;
+				currentY += btnH + margin;
 			}
-		});
-	}
-
-	_drawFooter(w, h) {
-		this.ctx.fillStyle = '#666';
-		this.ctx.font = '14px sans-serif';
-		this.ctx.textAlign = 'center';
-		this.ctx.textBaseline = 'alphabetic';
-
-		const hint = this.getFooterHint();
-		this.ctx.fillText(hint, w / 2, h - 20);
+		}
 	}
 
 	/**
-	 * 子类可覆盖底部提示文字
+	 * 屏幕选择回调（子类可重写拦截）
+	 * 默认行为：replaceScreen
 	 */
-	getFooterHint() {
-		return '点击选择 | ESC 返回';
-	}
-
-	/**
-	 * 导航到场景（入栈）
-	 */
-	goScene(sceneClass) {
-		this.sceneManager.goScene(sceneClass);
-	}
-
-	/**
-	 * 返回上个场景
-	 */
-	goBack() {
-		this.sceneManager.popScene();
-	}
-
-	handleBack() {
-		this.goBack();
-		return true;
+	onScreenSelected(sceneClass) {
+		this.sceneManager.replaceScreen(sceneClass);
 	}
 
 	_bindEvents() {
@@ -227,14 +123,11 @@ class SelectionScene extends Scene {
 			const y = e.clientY - rect.top;
 
 			let newHovered = -1;
-			if (this.itemLayout) {
-				for (const item of this.itemLayout) {
-					if (item.enabled &&
-						x >= item.x && x <= item.x + item.w &&
-						y >= item.y && y <= item.y + item.h) {
-						newHovered = item.index;
-						break;
-					}
+			for (const btn of this.buttons) {
+				if (x >= btn.x && x <= btn.x + btn.w &&
+					y >= btn.y && y <= btn.y + btn.h) {
+					newHovered = btn.index;
+					break;
 				}
 			}
 
@@ -244,12 +137,10 @@ class SelectionScene extends Scene {
 		};
 
 		this._onClick = (e) => {
-			if (this.hoveredIndex >= 0) {
-				const item = this.items[this.hoveredIndex];
-				if (item && item.callback && item.enabled) {
-					if (window.logger) logger.log('SELECT', `Selected: ${item.label}`);
-					item.callback();
-				}
+			if (this.hoveredIndex >= 0 && this.hoveredIndex < this.buttons.length) {
+				const btn = this.buttons[this.hoveredIndex];
+				if (window.logger) logger.log('SELECT', `Selected: ${btn.sceneClass.name}`);
+				this.onScreenSelected(btn.sceneClass);
 			}
 		};
 
