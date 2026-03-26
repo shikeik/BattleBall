@@ -42,9 +42,10 @@ class SettingsScreen extends Screen {
 
 		// 设置项
 		const itemH = 60;
-		const startY = 150;
 		const itemW = Math.min(400, w - 40);
 		const itemX = (w - itemW) / 2;
+		// 动态计算起始Y位置，确保在标题下方有足够空间
+		const startY = Math.max(150, h * 0.25);
 
 		this.settings.forEach((setting, i) => {
 			const y = startY + i * (itemH + 20);
@@ -89,21 +90,22 @@ class SettingsScreen extends Screen {
 			ctx.fill();
 		});
 
-		// 返回按钮
-		this._renderBackButton(ctx, w, h);
+		// 返回按钮（在设置项下方，不重叠）
+		const lastItemY = startY + (this.settings.length - 1) * (itemH + 20);
+		const backButtonY = Math.min(lastItemY + itemH + 40, h - 80);
+		this._renderBackButton(ctx, w, backButtonY);
 
 		// 底部提示
 		ctx.fillStyle = '#666';
 		ctx.font = '14px sans-serif';
 		ctx.textAlign = 'center';
-		ctx.fillText('点击设置项切换开关 | 返回键返回', w / 2, h - 30);
+		ctx.fillText('点击设置项切换开关 | 返回键返回', w / 2, h - 20);
 	}
 
-	_renderBackButton(ctx, w, h) {
+	_renderBackButton(ctx, w, y) {
 		const btnW = 120;
 		const btnH = 40;
 		const x = (w - btnW) / 2;
-		const y = h - 100;
 		const isHovered = this.hoveredIndex === -2; // -2 表示返回按钮
 
 		ctx.fillStyle = isHovered ? '#e94560' : '#c73e54';
@@ -144,9 +146,9 @@ class SettingsScreen extends Screen {
 
 			// 检查设置项悬停
 			const itemH = 60;
-			const startY = 150;
 			const itemW = Math.min(400, w - 40);
 			const itemX = (w - itemW) / 2;
+			const startY = Math.max(150, h * 0.25);
 
 			let newHovered = -1;
 			this.settings.forEach((setting, i) => {
@@ -160,7 +162,8 @@ class SettingsScreen extends Screen {
 			const btnW = 120;
 			const btnH = 40;
 			const bx = (w - btnW) / 2;
-			const by = h - 100;
+			const lastItemY = startY + (this.settings.length - 1) * (itemH + 20);
+			const by = Math.min(lastItemY + itemH + 40, h - 80);
 			if (x >= bx && x <= bx + btnW && y >= by && y <= by + btnH) {
 				newHovered = -2;
 			}

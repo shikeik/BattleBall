@@ -45,7 +45,7 @@
 	<title>New Game</title>
 	<link rel="stylesheet" href="css/main.css">
 </head>
-<body style="margin:0;padding:0;background:#1a1a2e;display:flex;justify-content:center;align-items:center;min-height:100vh;">
+<body style="margin:0;padding:0;background:#1a1a2e;overflow:hidden;">
 	<canvas id="gameCanvas" style="display:block;"></canvas>
 	
 	<!-- UI层：初始隐藏，加载完成后显示 -->
@@ -167,13 +167,12 @@
 				return;
 			}
 			
-			// 设置 canvas 尺寸
+			// 设置 canvas 填满视口
 			function resizeCanvas() {
-				const size = Math.min(window.innerWidth, window.innerHeight) * 0.9;
-				canvas.width = size;
-				canvas.height = size;
-				canvas.style.width = size + 'px';
-				canvas.style.height = size + 'px';
+				canvas.width = window.innerWidth;
+				canvas.height = window.innerHeight;
+				canvas.style.width = '100vw';
+				canvas.style.height = '100vh';
 			}
 			resizeCanvas();
 			window.addEventListener('resize', resizeCanvas);
