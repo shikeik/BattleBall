@@ -33,7 +33,7 @@ class BattleBallScreen extends Screen {
         this.worldCamera = {
             x: 0, // 相机中心 X
             y: 0, // 相机中心 Y
-            zoom: 1.0, // 缩放级别
+            zoom: 3.0, // 默认缩放级别 (对应 viewScale=1，近距离)
             width: this.screenWidth,
             height: this.screenHeight
         };
@@ -178,15 +178,15 @@ class BattleBallScreen extends Screen {
     /**
      * 设置相机缩放
      * @param {number} viewScale - 视野大小系数 (1-10)
-     *   1 = 当前 3x 放大效果（近距离）
-     *   10 = 总览全图（远距离）
+     *   1 = 3x 放大效果（近距离）
+     *   10 = 总览全图甚至更大（远距离）
      */
     setCameraZoom(viewScale) {
-        // 将 1-10 映射到 3.0-0.3 的 zoom 值
+        // 将 1-10 映射到 3.0-0.08 的 zoom 值
         // 1 -> 3.0x (放大，近距离)
-        // 10 -> 0.3x (缩小，远距离，总览全图)
+        // 10 -> 0.08x (缩小，远距离，能看到整个 4000x4000 地图甚至更大)
         const normalized = Math.max(1, Math.min(10, viewScale));
-        const zoom = 3.0 - (normalized - 1) * (2.7 / 9); // 从 3.0 线性降到 0.3
+        const zoom = 3.0 - (normalized - 1) * (2.92 / 9); // 从 3.0 降到 0.08
         this.worldCamera.zoom = zoom;
         if (window.logger)
             logger.log('BATTLE', `Camera zoom: ${zoom.toFixed(2)} (viewScale: ${normalized})`);

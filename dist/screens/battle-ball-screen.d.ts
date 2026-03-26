@@ -53,8 +53,8 @@ declare class BattleBallScreen extends Screen {
     /**
      * 设置相机缩放
      * @param {number} viewScale - 视野大小系数 (1-10)
-     *   1 = 当前 3x 放大效果（近距离）
-     *   10 = 总览全图（远距离）
+     *   1 = 3x 放大效果（近距离）
+     *   10 = 总览全图甚至更大（远距离）
      */
     setCameraZoom(viewScale: number): void;
     /**
