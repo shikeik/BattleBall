@@ -1,6 +1,5 @@
 /**
  * BattleBallScreen - 球球大作战游戏场景
- * 第一阶段：基础框架
  * 
  * 设计：
  * - UI 渲染使用 this.uiViewport（固定 540x960）
@@ -8,8 +7,6 @@
  */
 class BattleBallScreen extends Screen {
 	init() {
-		this.canvas = document.getElementById('gameCanvas');
-		
 		// 地图配置
 		this.mapSize = 4000;
 		this.gridSize = 100;
@@ -46,6 +43,7 @@ class BattleBallScreen extends Screen {
 	enter() {
 		super.enter();
 		this._bindEvents();
+		
 		if (window.logger) logger.log('BATTLE', 'BattleBallScreen enter');
 	}
 	
@@ -57,8 +55,9 @@ class BattleBallScreen extends Screen {
 	
 	render(delta) {
 		if (!this.visible) return;
-		if (!this.canvas) return;
-		const ctx = this.canvas.getContext('2d');
+		const canvas = this.getCanvas();
+		if (!canvas) return;
+		const ctx = canvas.getContext('2d');
 		if (!ctx) return;
 		
 		// 更新世界相机位置跟随玩家
@@ -67,7 +66,7 @@ class BattleBallScreen extends Screen {
 		
 		// 清空画布
 		ctx.setTransform(1, 0, 0, 1, 0, 0);
-		ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+		ctx.clearRect(0, 0, canvas.width, canvas.height);
 		
 		// 应用 DPR 缩放
 		ctx.scale(this.dpr, this.dpr);
@@ -215,36 +214,41 @@ class BattleBallScreen extends Screen {
 	}
 	
 	/**
-	 * 窗口大小变化
-	 */
-	resize() {
-		super.resize();
-		if (window.logger) logger.log('BATTLE', `Resized to ${this.screenWidth}x${this.screenHeight}`);
+	 * resize 回调
+	 * 基类已经处理了 Viewport 和 canvas 尺寸更新
+	 * 这里只需要处理世界相机的特殊逻辑
+	 */	onResize() {
+		// 世界相机的宽高已经在基类 resize 中更新
+		// 这里可以添加额外的逻辑，如保持中心点等
+		
+		if (window.logger) {
+			const isLandscape = this.screenWidth > this.screenHeight;
+			logger.log('BATTLE', `onResize: ${this.screenWidth}x${this.screenHeight} (${isLandscape ? 'landscape' : 'portrait'})`);
+		}
 	}
 	
 	/**
 	 * 绑定事件
 	 */
 	_bindEvents() {
-		// 窗口大小变化
-		this._onResize = () => this.resize();
-		window.addEventListener('resize', this._onResize);
+		const canvas = this.getCanvas();
+		if (!canvas) return;
 		
 		// 点击返回
 		this._onClick = () => {
 			if (window.logger) logger.log('BATTLE', 'Screen clicked, going back');
 			this.screenManager.popScreen();
 		};
-		this.canvas.addEventListener('click', this._onClick);
+		canvas.addEventListener('click', this._onClick);
 	}
 	
 	/**
 	 * 解绑事件
 	 */
 	_unbindEvents() {
-		window.removeEventListener('resize', this._onResize);
-		if (this.canvas) {
-			this.canvas.removeEventListener('click', this._onClick);
+		const canvas = this.getCanvas();
+		if (canvas) {
+			canvas.removeEventListener('click', this._onClick);
 		}
 	}
 	

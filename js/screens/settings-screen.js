@@ -3,7 +3,6 @@
  */
 class SettingsScreen extends Screen {
 	init() {
-		this.canvas = document.getElementById('gameCanvas');
 		this.settings = [
 			{ name: 'sound', label: '音效', value: true },
 			{ name: 'music', label: '音乐', value: true },
@@ -24,13 +23,14 @@ class SettingsScreen extends Screen {
 
 	render(delta) {
 		if (!this.visible) return;
-		if (!this.canvas) return;
-		const ctx = this.canvas.getContext('2d');
+		const canvas = this.getCanvas();
+		if (!canvas) return;
+		const ctx = canvas.getContext('2d');
 		if (!ctx) return;
 		
 		// 清空画布
 		ctx.setTransform(1, 0, 0, 1, 0, 0);
-		ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+		ctx.clearRect(0, 0, canvas.width, canvas.height);
 		ctx.scale(this.dpr, this.dpr);
 		
 		// 使用自己的 UI Viewport
@@ -152,11 +152,14 @@ class SettingsScreen extends Screen {
 	}
 
 	_bindEvents() {
+		const canvas = this.getCanvas();
+		if (!canvas) return;
+		
 		// 转换屏幕坐标到世界坐标
 		const getPointerPos = (clientX, clientY) => {
 			if (!this.uiViewport) return { x: 0, y: 0 };
 			
-			const rect = this.canvas.getBoundingClientRect();
+			const rect = canvas.getBoundingClientRect();
 			const screenX = clientX - rect.left;
 			const screenY = clientY - rect.top;
 			return this.uiViewport.toWorld(screenX, screenY);
@@ -208,14 +211,15 @@ class SettingsScreen extends Screen {
 			}
 		};
 
-		this.canvas.addEventListener('mousemove', this._onMouseMove);
-		this.canvas.addEventListener('click', this._onClick);
+		canvas.addEventListener('mousemove', this._onMouseMove);
+		canvas.addEventListener('click', this._onClick);
 	}
 
 	_unbindEvents() {
-		if (this.canvas) {
-			this.canvas.removeEventListener('mousemove', this._onMouseMove);
-			this.canvas.removeEventListener('click', this._onClick);
+		const canvas = this.getCanvas();
+		if (canvas) {
+			canvas.removeEventListener('mousemove', this._onMouseMove);
+			canvas.removeEventListener('click', this._onClick);
 		}
 	}
 }

@@ -6,13 +6,11 @@ class SelectionScreen extends Screen {
 	constructor(screenManager) {
 		super(screenManager);
 		this.screenMapping = new Map();
-		this.canvas = null;
 		this.hoveredIndex = -1;
 		this.buttons = []; // 只存储实际按钮（排除分隔线）
 	}
 
 	init() {
-		this.canvas = document.getElementById('gameCanvas');
 		this.initScreenMapping(this.screenMapping);
 		
 		// 检查 mapping 中的值
@@ -46,13 +44,14 @@ class SelectionScreen extends Screen {
 
 	render(delta) {
 		if (!this.visible) return;
-		if (!this.canvas) return;
-		const ctx = this.canvas.getContext('2d');
+		const canvas = this.getCanvas();
+		if (!canvas) return;
+		const ctx = canvas.getContext('2d');
 		if (!ctx) return;
 		
 		// 清空画布
 		ctx.setTransform(1, 0, 0, 1, 0, 0);
-		ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+		ctx.clearRect(0, 0, canvas.width, canvas.height);
 		ctx.scale(this.dpr, this.dpr);
 		
 		// 使用自己的 UI Viewport
@@ -147,11 +146,14 @@ class SelectionScreen extends Screen {
 	}
 
 	_bindEvents() {
+		const canvas = this.getCanvas();
+		if (!canvas) return;
+		
 		// 转换屏幕坐标到世界坐标
 		const getPointerPos = (clientX, clientY) => {
 			if (!this.uiViewport) return { x: 0, y: 0 };
 			
-			const rect = this.canvas.getBoundingClientRect();
+			const rect = canvas.getBoundingClientRect();
 			const screenX = clientX - rect.left;
 			const screenY = clientY - rect.top;
 			return this.uiViewport.toWorld(screenX, screenY);
@@ -208,18 +210,19 @@ class SelectionScreen extends Screen {
 			}
 		};
 
-		this.canvas.addEventListener('mousemove', this._onMouseMove);
-		this.canvas.addEventListener('click', this._onClick);
-		this.canvas.addEventListener('touchstart', this._onTouchStart, { passive: false });
-		this.canvas.addEventListener('touchend', this._onTouchEnd, { passive: false });
+		canvas.addEventListener('mousemove', this._onMouseMove);
+		canvas.addEventListener('click', this._onClick);
+		canvas.addEventListener('touchstart', this._onTouchStart, { passive: false });
+		canvas.addEventListener('touchend', this._onTouchEnd, { passive: false });
 	}
 
 	_unbindEvents() {
-		if (this.canvas) {
-			this.canvas.removeEventListener('mousemove', this._onMouseMove);
-			this.canvas.removeEventListener('click', this._onClick);
-			this.canvas.removeEventListener('touchstart', this._onTouchStart);
-			this.canvas.removeEventListener('touchend', this._onTouchEnd);
+		const canvas = this.getCanvas();
+		if (canvas) {
+			canvas.removeEventListener('mousemove', this._onMouseMove);
+			canvas.removeEventListener('click', this._onClick);
+			canvas.removeEventListener('touchstart', this._onTouchStart);
+			canvas.removeEventListener('touchend', this._onTouchEnd);
 		}
 	}
 }
