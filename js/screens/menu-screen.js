@@ -4,7 +4,8 @@
  */
 class MenuScreen extends SelectionScreen {
 	initScreenMapping(map) {
-		if (window.logger) logger.log('TMP', 'initScreenMapping:', { GameScreen, WebGPUScreen, SettingsScreen });
+		if (window.logger) logger.log('TMP', 'initScreenMapping:', { GameScreen, WebGPUScreen, SettingsScreen, BattleBallScreen });
+		map.set('球球大作战', BattleBallScreen);
 		map.set('开始游戏', GameScreen);
 		map.set('WebGPU 演示', WebGPUScreen);
 		map.set('其他', null); // 分隔线
