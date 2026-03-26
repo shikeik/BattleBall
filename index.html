@@ -182,16 +182,12 @@
 			
 			// 创建视口（竖屏：540x960）
 			const dpr = window.devicePixelRatio || 1;
-			const viewport = createViewport(540, 960, window.innerWidth > window.innerHeight);
-			viewport.update(window.innerWidth, window.innerHeight, dpr);
+			// 设置 canvas 实际像素尺寸（考虑 DPR）
+			canvas.width = Math.floor(window.innerWidth * dpr);
+			canvas.height = Math.floor(window.innerHeight * dpr);
 			
-			// 设置 canvas 实际像素尺寸
-			const canvasSize = viewport.getCanvasSize();
-			canvas.width = canvasSize.width;
-			canvas.height = canvasSize.height;
-			
-			// 创建屏幕管理器
-			const screenManager = new ScreenManager(viewport);
+			// 创建屏幕管理器（每个屏幕有自己的独立视口）
+			const screenManager = new ScreenManager();
 			window.screenManager = screenManager;
 			
 			// 注册屏幕

@@ -33,19 +33,23 @@ class GameScreen extends Screen {
 	}
 	
 	render(delta) {
+		if (!this.visible) return;
 		if (!this.canvas) return;
 		const ctx = this.canvas.getContext('2d');
 		if (!ctx) return;
 		
-		const viewport = this.getViewport();
-		if (!viewport) return;
+		// 清空画布
+		ctx.setTransform(1, 0, 0, 1, 0, 0);
+		ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+		ctx.scale(this.dpr, this.dpr);
 		
-		// 应用视口变换
-		viewport.apply(ctx);
-		viewport.beginWorldRender(ctx);
+		// 使用自己的 UI Viewport
+		if (!this.uiViewport) return;
+		this.uiViewport.apply(ctx);
+		this.uiViewport.beginWorldRender(ctx);
 		
-		const w = viewport.worldWidth;
-		const h = viewport.worldHeight;
+		const w = this.uiViewport.worldWidth;
+		const h = this.uiViewport.worldHeight;
 
 		ctx.fillStyle = '#0a0a1a';
 		ctx.fillRect(0, 0, w, h);
@@ -59,7 +63,7 @@ class GameScreen extends Screen {
 		ctx.fillStyle = '#666';
 		ctx.fillText('点击屏幕返回主菜单', w / 2, h - 30);
 		
-		viewport.endWorldRender(ctx);
+		this.uiViewport.endWorldRender(ctx);
 	}
 	
 	_handleClick() {

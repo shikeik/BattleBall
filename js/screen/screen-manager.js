@@ -3,15 +3,12 @@
  * 管理屏幕生命周期、导航栈、转场效果
  */
 class ScreenManager {
-	constructor(viewport) {
+	constructor() {
 		this.screens = new Map();
 		this.screenStack = [];
 		this.currentScreen = null;
 		this.launchScreen = null;
 		this.popping = false;
-
-		// 视口系统
-		this.viewport = viewport || createViewport(540, 960, false);
 
 		// 转场状态
 		this.transitionState = 'NONE';
