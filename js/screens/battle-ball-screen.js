@@ -48,22 +48,25 @@ class BattleBallScreen extends Screen {
 		const viewport = this.getViewport();
 		if (!viewport) return;
 		
-		// 更新相机缩放
-		viewport.scale = this.cameraZoom;
+		// 保存原始变换
+		ctx.save();
 		
-		// 相机跟随玩家
-		viewport.offsetX = viewport.screenWidth / 2 - this.player.x * viewport.scale;
-		viewport.offsetY = viewport.screenHeight / 2 - this.player.y * viewport.scale;
+		// 计算相机变换（不修改 viewport 的共享状态）
+		const scale = this.cameraZoom;
+		const offsetX = viewport.screenWidth / 2 - this.player.x * scale;
+		const offsetY = viewport.screenHeight / 2 - this.player.y * scale;
 		
-		// 应用视口变换
-		viewport.apply(ctx);
+		// 应用 DPR 缩放
+		ctx.setTransform(1, 0, 0, 1, 0, 0);
+		ctx.scale(viewport.dpr, viewport.dpr);
 		
-		// 绘制背景
+		// 绘制背景（屏幕坐标）
 		ctx.fillStyle = '#0a0a1a';
 		ctx.fillRect(0, 0, viewport.screenWidth, viewport.screenHeight);
 		
-		// 开始世界坐标系渲染
-		viewport.beginWorldRender(ctx);
+		// 应用相机变换（世界坐标）
+		ctx.translate(offsetX, offsetY);
+		ctx.scale(scale, scale);
 		
 		// 绘制网格
 		this._renderGrid(ctx);
@@ -74,7 +77,8 @@ class BattleBallScreen extends Screen {
 		// 绘制玩家
 		this._renderPlayer(ctx);
 		
-		viewport.endWorldRender(ctx);
+		// 恢复变换
+		ctx.restore();
 	}
 	
 	/**
