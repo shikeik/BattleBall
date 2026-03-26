@@ -27,8 +27,15 @@ class SettingsScreen extends Screen {
 		const ctx = this.canvas.getContext('2d');
 		if (!ctx) return;
 
-		const w = this.canvas.width;
-		const h = this.canvas.height;
+		const viewport = this.getViewport();
+		if (!viewport) return;
+
+		// 应用视口变换
+		viewport.apply(ctx);
+		viewport.beginWorldRender(ctx);
+
+		const w = viewport.worldWidth;
+		const h = viewport.worldHeight;
 
 		// 背景
 		ctx.fillStyle = '#16213e';
@@ -44,8 +51,7 @@ class SettingsScreen extends Screen {
 		const itemH = 60;
 		const itemW = Math.min(400, w - 40);
 		const itemX = (w - itemW) / 2;
-		// 动态计算起始Y位置，确保在标题下方有足够空间
-		const startY = Math.max(150, h * 0.25);
+		const startY = 150;
 
 		this.settings.forEach((setting, i) => {
 			const y = startY + i * (itemH + 20);
@@ -90,16 +96,18 @@ class SettingsScreen extends Screen {
 			ctx.fill();
 		});
 
-		// 返回按钮（在设置项下方，不重叠）
+		// 返回按钮
 		const lastItemY = startY + (this.settings.length - 1) * (itemH + 20);
-		const backButtonY = Math.min(lastItemY + itemH + 40, h - 80);
+		const backButtonY = lastItemY + itemH + 40;
 		this._renderBackButton(ctx, w, backButtonY);
 
 		// 底部提示
 		ctx.fillStyle = '#666';
 		ctx.font = '14px sans-serif';
 		ctx.textAlign = 'center';
-		ctx.fillText('点击设置项切换开关 | 返回键返回', w / 2, h - 20);
+		ctx.fillText('点击设置项切换开关 | 返回键返回', w / 2, h - 30);
+		
+		viewport.endWorldRender(ctx);
 	}
 
 	_renderBackButton(ctx, w, y) {
@@ -136,19 +144,29 @@ class SettingsScreen extends Screen {
 	}
 
 	_bindEvents() {
-		this._onMouseMove = (e) => {
+		const viewport = this.getViewport();
+		
+		// 转换屏幕坐标到世界坐标
+		const getPointerPos = (clientX, clientY) => {
 			const rect = this.canvas.getBoundingClientRect();
-			const x = e.clientX - rect.left;
-			const y = e.clientY - rect.top;
+			const screenX = clientX - rect.left;
+			const screenY = clientY - rect.top;
+			return viewport.toWorld(screenX, screenY);
+		};
+		
+		this._onMouseMove = (e) => {
+			const pos = getPointerPos(e.clientX, e.clientY);
+			const x = pos.x;
+			const y = pos.y;
 
-			const w = this.canvas.width;
-			const h = this.canvas.height;
+			const w = viewport.worldWidth;
+			const h = viewport.worldHeight;
 
 			// 检查设置项悬停
 			const itemH = 60;
 			const itemW = Math.min(400, w - 40);
 			const itemX = (w - itemW) / 2;
-			const startY = Math.max(150, h * 0.25);
+			const startY = 150;
 
 			let newHovered = -1;
 			this.settings.forEach((setting, i) => {
@@ -163,7 +181,7 @@ class SettingsScreen extends Screen {
 			const btnH = 40;
 			const bx = (w - btnW) / 2;
 			const lastItemY = startY + (this.settings.length - 1) * (itemH + 20);
-			const by = Math.min(lastItemY + itemH + 40, h - 80);
+			const by = lastItemY + itemH + 40;
 			if (x >= bx && x <= bx + btnW && y >= by && y <= by + btnH) {
 				newHovered = -2;
 			}

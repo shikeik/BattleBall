@@ -93,6 +93,7 @@ const SCRIPT_GROUPS = {
 	
 	// 屏幕管理系统
 	screen: [
+		{ name: 'Viewport', src: 'js/screen/viewport.js', weight: 1 },
 		{ name: 'Screen Base', src: 'js/screen/screen.js', weight: 1 },
 		{ name: 'Screen Manager', src: 'js/screen/screen-manager.js', weight: 1 },
 		{ name: 'Selection Screen', src: 'js/screen/selection-screen.js', weight: 1 },

@@ -52,6 +52,16 @@ class Screen {
 	}
 
 	/**
+	 * 获取视口
+	 */
+	getViewport() {
+		if (this.screenManager) {
+			return this.screenManager.viewport;
+		}
+		return null;
+	}
+
+	/**
 	 * 处理返回键
 	 * @returns {boolean} 是否已处理
 	 */

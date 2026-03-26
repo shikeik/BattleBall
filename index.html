@@ -169,21 +169,29 @@
 			
 			// 设置 canvas 填满视口
 			function resizeCanvas() {
-				canvas.width = window.innerWidth;
-				canvas.height = window.innerHeight;
 				canvas.style.width = '100vw';
 				canvas.style.height = '100vh';
 			}
 			resizeCanvas();
 			window.addEventListener('resize', resizeCanvas);
 			
-			if (!window.ScreenManager) {
-				if (window.logger) logger.log('SCREEN', 'ScreenManager not loaded');
+			if (!window.ScreenManager || !window.Viewport) {
+				if (window.logger) logger.log('SCREEN', 'ScreenManager or Viewport not loaded');
 				return;
 			}
 			
+			// 创建视口（竖屏：540x960）
+			const dpr = window.devicePixelRatio || 1;
+			const viewport = createViewport(540, 960, window.innerWidth > window.innerHeight);
+			viewport.update(window.innerWidth, window.innerHeight, dpr);
+			
+			// 设置 canvas 实际像素尺寸
+			const canvasSize = viewport.getCanvasSize();
+			canvas.width = canvasSize.width;
+			canvas.height = canvasSize.height;
+			
 			// 创建屏幕管理器
-			const screenManager = new ScreenManager();
+			const screenManager = new ScreenManager(viewport);
 			window.screenManager = screenManager;
 			
 			// 注册屏幕

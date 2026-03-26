@@ -49,15 +49,24 @@ class SelectionScreen extends Screen {
 		const ctx = this.canvas.getContext('2d');
 		if (!ctx) return;
 
-		const w = this.canvas.width;
-		const h = this.canvas.height;
+		const viewport = this.getViewport();
+		if (!viewport) return;
+
+		// 应用视口变换
+		viewport.apply(ctx);
+		
+		// 开始世界坐标系渲染
+		viewport.beginWorldRender(ctx);
 
 		// 背景
 		ctx.fillStyle = '#1a1a2e';
-		ctx.fillRect(0, 0, w, h);
+		ctx.fillRect(0, 0, viewport.worldWidth, viewport.worldHeight);
 
 		// 绘制按钮列表
-		this._drawButtons(ctx, w, h);
+		this._drawButtons(ctx, viewport.worldWidth, viewport.worldHeight);
+		
+		// 结束世界坐标系渲染
+		viewport.endWorldRender(ctx);
 	}
 
 	_drawButtons(ctx, w, h) {
@@ -136,23 +145,14 @@ class SelectionScreen extends Screen {
 	}
 
 	_bindEvents() {
-		// 获取缩放比例（canvas 逻辑坐标 -> 实际像素坐标）
-		const getScale = () => {
-			const rect = this.canvas.getBoundingClientRect();
-			return {
-				x: this.canvas.width / rect.width,
-				y: this.canvas.height / rect.height
-			};
-		};
-
-		// 转换坐标
+		const viewport = this.getViewport();
+		
+		// 转换屏幕坐标到世界坐标
 		const getPointerPos = (clientX, clientY) => {
 			const rect = this.canvas.getBoundingClientRect();
-			const scale = getScale();
-			return {
-				x: (clientX - rect.left) * scale.x,
-				y: (clientY - rect.top) * scale.y
-			};
+			const screenX = clientX - rect.left;
+			const screenY = clientY - rect.top;
+			return viewport.toWorld(screenX, screenY);
 		};
 
 		// 检查点击位置
