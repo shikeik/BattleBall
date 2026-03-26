@@ -1,5 +1,8 @@
 /**
  * Viewport - 视口系统
+ * 
+ * 支持动态调整 world 尺寸，用于横竖屏切换
+ * 参考原版 LibGDX ExtendViewport 设计
  */
 class Viewport {
 	worldWidth: number;
@@ -16,17 +19,48 @@ class Viewport {
 		this.worldHeight = worldHeight;
 	}
 
+	/**
+	 * 动态设置 world 尺寸
+	 * 用于横竖屏切换时调整逻辑分辨率
+	 */
+	setWorldSize(worldWidth: number, worldHeight: number): void {
+		this.worldWidth = worldWidth;
+		this.worldHeight = worldHeight;
+		// 重新计算缩放和偏移
+		this._recalculate();
+	}
+
+	/**
+	 * 根据当前方向自动调整 world 尺寸
+	 * 短边固定为 540，长边固定为 960
+	 */
+	updateOrientation(isLandscape: boolean): void {
+		const shortSide = 540;
+		const longSide = 960;
+		if (isLandscape) {
+			this.setWorldSize(longSide, shortSide);
+		} else {
+			this.setWorldSize(shortSide, longSide);
+		}
+	}
+
 	update(screenWidth: number, screenHeight: number, dpr: number = 1): void {
 		this.screenWidth = screenWidth;
 		this.screenHeight = screenHeight;
 		this.dpr = dpr;
+		this._recalculate();
+	}
 
-		const scaleX = screenWidth / this.worldWidth;
-		const scaleY = screenHeight / this.worldHeight;
+	/**
+	 * 重新计算缩放和偏移
+	 */
+	private _recalculate(): void {
+		const scaleX = this.screenWidth / this.worldWidth;
+		const scaleY = this.screenHeight / this.worldHeight;
 		this.scale = Math.min(scaleX, scaleY);
 
-		this.offsetX = (screenWidth - this.worldWidth * this.scale) / 2;
-		this.offsetY = (screenHeight - this.worldHeight * this.scale) / 2;
+		this.offsetX = (this.screenWidth - this.worldWidth * this.scale) / 2;
+		this.offsetY = (this.screenHeight - this.worldHeight * this.scale) / 2;
 	}
 
 	toWorld(screenX: number, screenY: number): { x: number; y: number } {
