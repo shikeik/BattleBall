@@ -167,8 +167,8 @@ class SettingsScreen extends Screen {
 			const x = pos.x;
 			const y = pos.y;
 
-			const w = viewport.worldWidth;
-			const h = viewport.worldHeight;
+			const w = this.uiViewport.worldWidth;
+			const h = this.uiViewport.worldHeight;
 
 			// 检查设置项悬停
 			const itemH = 60;
