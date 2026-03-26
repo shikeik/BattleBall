@@ -117,11 +117,22 @@ class SelectionScene extends Scene {
 
 	/**
 	 * 屏幕选择回调（子类可重写拦截）
-	 * 默认行为：replaceScreen
+	 * 默认行为：replaceScene
 	 */
 	onScreenSelected(sceneClass) {
-		console.log('onScreenSelected:', sceneClass.name);
-		this.sceneManager.replaceScreen(sceneClass);
+		if (window.logger) {
+			logger.log('SELECT', 'onScreenSelected called');
+			logger.log('SELECT', 'sceneClass: ' + sceneClass.name);
+			logger.log('SELECT', 'this: ' + this.constructor.name);
+			logger.log('SELECT', 'this.sceneManager type: ' + typeof this.sceneManager);
+			logger.log('SELECT', 'this.sceneManager constructor: ' + (this.sceneManager ? this.sceneManager.constructor.name : 'null'));
+			logger.log('SELECT', 'has replaceScene: ' + (this.sceneManager && this.sceneManager.replaceScene ? 'YES' : 'NO'));
+		}
+		if (this.sceneManager && this.sceneManager.replaceScene) {
+			this.sceneManager.replaceScene(sceneClass);
+		} else {
+			if (window.logger) logger.log('ERROR', 'sceneManager.replaceScene not available');
+		}
 	}
 
 	_bindEvents() {

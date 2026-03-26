@@ -32,7 +32,7 @@ class GameScene extends Scene {
 	}
 
 	handleBack() {
-		this.sceneManager.replaceScreen(MenuScene);
+		this.sceneManager.replaceScene(MenuScene);
 		return true;
 	}
 }
