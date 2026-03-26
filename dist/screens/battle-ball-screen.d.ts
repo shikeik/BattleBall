@@ -1,6 +1,5 @@
 /**
  * BattleBallScreen - 球球大作战游戏场景
- * 第一阶段：基础框架
  *
  * 设计：
  * - UI 渲染使用 this.uiViewport（固定 540x960）
@@ -8,7 +7,6 @@
  */
 declare class BattleBallScreen extends Screen {
     init(): void;
-    canvas: HTMLElement | null | undefined;
     mapSize: number | undefined;
     gridSize: number | undefined;
     mapLeft: number | undefined;
@@ -54,18 +52,20 @@ declare class BattleBallScreen extends Screen {
     _renderUI(ctx: any): void;
     /**
      * 设置相机缩放
+     * @param {number} viewScale - 视野大小系数 (1-10)
+     *   1 = 当前 3x 放大效果（近距离）
+     *   10 = 总览全图（远距离）
      */
-    setCameraZoom(zoom: any): void;
+    setCameraZoom(viewScale: number): void;
     /**
-     * 窗口大小变化
-     */
-    resize(): void;
+     * resize 回调
+     * 基类已经处理了 Viewport 和 canvas 尺寸更新
+     * 这里只需要处理世界相机的特殊逻辑
+     */ onResize(): void;
     /**
      * 绑定事件
      */
     _bindEvents(): void;
-    _onResize: (() => void) | undefined;
-    _onClick: (() => void) | undefined;
     /**
      * 解绑事件
      */

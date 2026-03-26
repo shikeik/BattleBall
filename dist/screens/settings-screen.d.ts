@@ -3,7 +3,6 @@
  */
 declare class SettingsScreen extends Screen {
     init(): void;
-    canvas: HTMLElement | null | undefined;
     settings: {
         name: string;
         label: string;

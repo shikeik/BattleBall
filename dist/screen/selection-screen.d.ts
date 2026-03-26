@@ -5,7 +5,6 @@
 declare class SelectionScreen extends Screen {
     constructor(screenManager: any);
     screenMapping: Map<any, any>;
-    canvas: HTMLElement | null;
     hoveredIndex: number;
     buttons: any[];
     init(): void;

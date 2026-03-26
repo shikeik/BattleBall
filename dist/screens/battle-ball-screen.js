@@ -1,7 +1,6 @@
 "use strict";
 /**
  * BattleBallScreen - 球球大作战游戏场景
- * 第一阶段：基础框架
  *
  * 设计：
  * - UI 渲染使用 this.uiViewport（固定 540x960）
@@ -9,7 +8,6 @@
  */
 class BattleBallScreen extends Screen {
     init() {
-        this.canvas = document.getElementById('gameCanvas');
         // 地图配置
         this.mapSize = 4000;
         this.gridSize = 100;
@@ -55,9 +53,10 @@ class BattleBallScreen extends Screen {
     render(delta) {
         if (!this.visible)
             return;
-        if (!this.canvas)
+        const canvas = this.getCanvas();
+        if (!canvas)
             return;
-        const ctx = this.canvas.getContext('2d');
+        const ctx = canvas.getContext('2d');
         if (!ctx)
             return;
         // 更新世界相机位置跟随玩家
@@ -65,7 +64,7 @@ class BattleBallScreen extends Screen {
         this.worldCamera.y = this.player.y;
         // 清空画布
         ctx.setTransform(1, 0, 0, 1, 0, 0);
-        ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
         // 应用 DPR 缩放
         ctx.scale(this.dpr, this.dpr);
         // 计算世界渲染参数
@@ -173,48 +172,49 @@ class BattleBallScreen extends Screen {
         // 底部提示
         ctx.fillStyle = '#888888';
         ctx.textAlign = 'center';
-        ctx.fillText('点击屏幕返回主菜单', w / 2, h - 30);
+        ctx.fillText('使用工具条返回按钮退出', w / 2, h - 30);
         this.uiViewport.endWorldRender(ctx);
     }
     /**
      * 设置相机缩放
+     * @param {number} viewScale - 视野大小系数 (1-10)
+     *   1 = 当前 3x 放大效果（近距离）
+     *   10 = 总览全图（远距离）
      */
-    setCameraZoom(zoom) {
-        this.worldCamera.zoom = Math.max(0.5, Math.min(3.0, zoom));
+    setCameraZoom(viewScale) {
+        // 将 1-10 映射到 3.0-0.3 的 zoom 值
+        // 1 -> 3.0x (放大，近距离)
+        // 10 -> 0.3x (缩小，远距离，总览全图)
+        const normalized = Math.max(1, Math.min(10, viewScale));
+        const zoom = 3.0 - (normalized - 1) * (2.7 / 9); // 从 3.0 线性降到 0.3
+        this.worldCamera.zoom = zoom;
         if (window.logger)
-            logger.log('BATTLE', `Camera zoom: ${this.worldCamera.zoom.toFixed(2)}`);
+            logger.log('BATTLE', `Camera zoom: ${zoom.toFixed(2)} (viewScale: ${normalized})`);
     }
     /**
-     * 窗口大小变化
-     */
-    resize() {
-        super.resize();
-        if (window.logger)
-            logger.log('BATTLE', `Resized to ${this.screenWidth}x${this.screenHeight}`);
+     * resize 回调
+     * 基类已经处理了 Viewport 和 canvas 尺寸更新
+     * 这里只需要处理世界相机的特殊逻辑
+     */ onResize() {
+        // 世界相机的宽高已经在基类 resize 中更新
+        // 这里可以添加额外的逻辑，如保持中心点等
+        if (window.logger) {
+            const isLandscape = this.screenWidth > this.screenHeight;
+            logger.log('BATTLE', `onResize: ${this.screenWidth}x${this.screenHeight} (${isLandscape ? 'landscape' : 'portrait'})`);
+        }
     }
     /**
      * 绑定事件
      */
     _bindEvents() {
-        // 窗口大小变化
-        this._onResize = () => this.resize();
-        window.addEventListener('resize', this._onResize);
-        // 点击返回
-        this._onClick = () => {
-            if (window.logger)
-                logger.log('BATTLE', 'Screen clicked, going back');
-            this.screenManager.popScreen();
-        };
-        this.canvas.addEventListener('click', this._onClick);
+        // 不再绑定点击返回事件，避免误触
+        // 返回只能通过工具条返回按钮或物理返回键
     }
     /**
      * 解绑事件
      */
     _unbindEvents() {
-        window.removeEventListener('resize', this._onResize);
-        if (this.canvas) {
-            this.canvas.removeEventListener('click', this._onClick);
-        }
+        // 无事件需要解绑
     }
     handleBack() {
         if (window.logger)

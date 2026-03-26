@@ -18,6 +18,8 @@ class GScreen {
         this.dpr = 1;
         // resize 事件处理
         this._resizeHandler = null;
+        // canvas 引用（子类可通过 getCanvas() 获取）
+        this._canvas = null;
         if (screenManager) {
             this.screenManager = screenManager;
         }

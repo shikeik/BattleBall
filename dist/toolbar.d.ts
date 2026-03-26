@@ -37,8 +37,19 @@ declare class Toolbar {
     goToPage(page: any): void;
     goBack(): void;
     toggleFullscreen(): Promise<void>;
+    toggleOrientation(): Promise<void>;
+    /**
+     * 通知当前屏幕触发 resize 处理
+     * 用于全屏切换后的强制刷新
+     */
+    _notifyResize(): void;
     toggleSettings(): void;
     toggleDebugPanel(): void;
+    /**
+     * 相机缩放滑动条变化回调
+     * @param {string} value - 视野大小系数 1-10
+     */
+    _onCameraZoomChange(value: string): void;
     createSettingsPanel(): void;
     createDebugPanel(): void;
     updateLogButton(isOpen: any): void;

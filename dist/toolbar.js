@@ -98,11 +98,19 @@ class Toolbar {
             page: 0,
             onClick: () => this.goBack()
         });
+        // 第2个按钮：全屏切换
         this.registerButton({
             id: 'fullscreen',
             icon: '⛶',
             page: 0,
             onClick: () => this.toggleFullscreen()
+        });
+        // 第3个按钮：转屏切换
+        this.registerButton({
+            id: 'rotate',
+            icon: '🔄',
+            page: 0,
+            onClick: () => this.toggleOrientation()
         });
         this.registerButton({
             id: 'log',
@@ -397,24 +405,87 @@ class Toolbar {
         try {
             if (!document.fullscreenElement) {
                 await document.documentElement.requestFullscreen();
-                if (screen.orientation?.lock) {
-                    screen.orientation.lock('landscape').catch(() => { });
-                }
                 if (window.logger)
-                    logger.log('TOOLBAR', '进入全屏并切换为横屏');
+                    logger.log('TOOLBAR', '进入全屏');
             }
             else {
                 await document.exitFullscreen();
-                if (screen.orientation?.lock) {
-                    screen.orientation.lock('portrait').catch(() => { });
-                }
                 if (window.logger)
-                    logger.log('TOOLBAR', '退出全屏并返回竖屏');
+                    logger.log('TOOLBAR', '退出全屏');
             }
+            // 延迟触发 resize，等待屏幕尺寸稳定（全屏切换可能需要更长时间）
+            setTimeout(() => {
+                this._notifyResize();
+            }, 500);
         }
         catch (e) {
             console.log('全屏切换失败:', e);
         }
+    }
+    // 切换屏幕方向（转屏）
+    async toggleOrientation() {
+        try {
+            if (!screen.orientation) {
+                if (window.logger)
+                    logger.log('TOOLBAR', '当前设备不支持屏幕方向锁定');
+                return;
+            }
+            // 使用 window.innerWidth/Height 判断当前方向更准确
+            const isLandscape = window.innerWidth > window.innerHeight;
+            if (window.logger)
+                logger.log('TOOLBAR', `当前方向: ${isLandscape ? '横屏' : '竖屏'}, 准备切换...`);
+            let lockResult;
+            if (isLandscape) {
+                // 当前是横屏，切换到竖屏
+                lockResult = await screen.orientation.lock('portrait').catch((e) => e);
+                if (lockResult instanceof Error) {
+                    if (window.logger)
+                        logger.log('TOOLBAR', `切换到竖屏失败: ${lockResult.message}`);
+                }
+                else {
+                    if (window.logger)
+                        logger.log('TOOLBAR', '切换到竖屏成功');
+                }
+            }
+            else {
+                // 当前是竖屏，切换到横屏
+                lockResult = await screen.orientation.lock('landscape').catch((e) => e);
+                if (lockResult instanceof Error) {
+                    if (window.logger)
+                        logger.log('TOOLBAR', `切换到横屏失败: ${lockResult.message}`);
+                }
+                else {
+                    if (window.logger)
+                        logger.log('TOOLBAR', '切换到横屏成功');
+                }
+            }
+            // 延迟触发 resize，等待屏幕尺寸稳定
+            setTimeout(() => {
+                this._notifyResize();
+            }, 500);
+        }
+        catch (e) {
+            if (window.logger)
+                logger.log('TOOLBAR', `转屏失败: ${e.message}`);
+            console.log('转屏失败:', e);
+        }
+    }
+    /**
+     * 通知当前屏幕触发 resize 处理
+     * 用于全屏切换后的强制刷新
+     */
+    _notifyResize() {
+        // 通知当前屏幕
+        if (window.screenManager && window.screenManager.currentScreen) {
+            const screen = window.screenManager.currentScreen;
+            if (screen.resize) {
+                screen.resize();
+                if (window.logger)
+                    logger.log('TOOLBAR', 'Notified current screen to resize');
+            }
+        }
+        // 同时触发全局 resize 事件（让其他监听者也能收到）
+        window.dispatchEvent(new Event('resize'));
     }
     // 切换设置面板
     toggleSettings() {
@@ -433,6 +504,27 @@ class Toolbar {
             panel = document.getElementById('debug-panel');
         }
         panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+    }
+    /**
+     * 相机缩放滑动条变化回调
+     * @param {string} value - 视野大小系数 1-10
+     */
+    _onCameraZoomChange(value) {
+        const viewScale = parseInt(value);
+        // 更新显示值
+        const valueDisplay = document.getElementById('camera-zoom-value');
+        if (valueDisplay) {
+            valueDisplay.textContent = viewScale;
+        }
+        // 通知当前屏幕设置相机缩放
+        if (window.screenManager && window.screenManager.currentScreen) {
+            const screen = window.screenManager.currentScreen;
+            if (screen.setCameraZoom) {
+                screen.setCameraZoom(viewScale);
+                if (window.logger)
+                    logger.log('TOOLBAR', `View scale set to ${viewScale}`);
+            }
+        }
     }
     // 创建设置面板
     createSettingsPanel() {
@@ -484,7 +576,20 @@ class Toolbar {
 		`;
         panel.innerHTML = `
 			<h3 style="margin-bottom:20px;text-align:center;text-shadow:0 0 10px #0ff;">🐛 调试面板</h3>
-			<p style="text-align:center;color:#888;font-size:12px;">暂无可用调试选项</p>
+			
+			<!-- 相机缩放控制 -->
+			<div style="margin-bottom:20px;">
+				<label style="display:block;margin-bottom:10px;font-size:14px;">视野大小</label>
+				<input type="range" id="camera-zoom-slider" min="1" max="10" step="1" value="1"
+					   style="width:100%;cursor:pointer;"
+					   oninput="window.toolbar._onCameraZoomChange(this.value)">
+				<div style="display:flex;justify-content:space-between;margin-top:5px;font-size:12px;color:#888;">
+					<span>1 (近)</span>
+					<span id="camera-zoom-value">1</span>
+					<span>10 (远)</span>
+				</div>
+			</div>
+			
 			<div style="text-align:center;margin-top:20px;">
 				<button onclick="document.getElementById('debug-panel').style.display='none'" 
 						style="padding:10px 30px;background:transparent;border:2px solid #0ff;color:#0ff;cursor:pointer;font-family:inherit;border-radius:4px;">关闭</button>
