@@ -62,6 +62,7 @@ class BattleBallScreen extends Screen {
 	}
 	
 	render(delta) {
+		if (!this.visible) return;
 		if (!this.canvas) return;
 		const ctx = this.canvas.getContext('2d');
 		if (!ctx) return;
