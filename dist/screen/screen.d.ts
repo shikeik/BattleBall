@@ -18,13 +18,17 @@ declare class GScreen {
     dpr: number;
     private _resizeHandler;
     protected _canvas: HTMLCanvasElement | null;
-    static readonly SAFE_AREA_TOP: number;
-    static readonly SAFE_AREA_BOTTOM: number;
-    static readonly SAFE_AREA_LEFT: number;
-    static readonly SAFE_AREA_RIGHT: number;
+    constructor(screenManager?: any);
+    initialize(): void;
     /**
      * 获取 UI 安全区域
      * 返回考虑工具条等因素后的可用区域
+     *
+     * 安全区域常量：
+     * - SAFE_AREA_TOP = 50 (工具条高度)
+     * - SAFE_AREA_BOTTOM = 0
+     * - SAFE_AREA_LEFT = 0
+     * - SAFE_AREA_RIGHT = 0
      */
     getSafeArea(): {
         x: number;
@@ -32,8 +36,6 @@ declare class GScreen {
         width: number;
         height: number;
     };
-    constructor(screenManager?: any);
-    initialize(): void;
     _updateScreenSize(): void;
     /**
      * 获取 canvas 元素

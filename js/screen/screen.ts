@@ -23,24 +23,7 @@ class GScreen {
 	// canvas 引用（子类可通过 getCanvas() 获取）
 	protected _canvas: HTMLCanvasElement | null = null;
 	
-	// UI 安全区域常量（工具条高度）
-	static readonly SAFE_AREA_TOP: number = 50;    // 工具条高度
-	static readonly SAFE_AREA_BOTTOM: number = 0;  // 底部安全区域
-	static readonly SAFE_AREA_LEFT: number = 0;    // 左侧安全区域
-	static readonly SAFE_AREA_RIGHT: number = 0;   // 右侧安全区域
-	
-	/**
-	 * 获取 UI 安全区域
-	 * 返回考虑工具条等因素后的可用区域
-	 */
-	getSafeArea(): { x: number; y: number; width: number; height: number } {
-		return {
-			x: GScreen.SAFE_AREA_LEFT,
-			y: GScreen.SAFE_AREA_TOP,
-			width: this.screenWidth - GScreen.SAFE_AREA_LEFT - GScreen.SAFE_AREA_RIGHT,
-			height: this.screenHeight - GScreen.SAFE_AREA_TOP - GScreen.SAFE_AREA_BOTTOM
-		};
-	}
+
 
 	constructor(screenManager?: any) {
 		if (screenManager) {
@@ -60,6 +43,29 @@ class GScreen {
 		this.init();
 		this.initialized = true;
 		if ((window as any).logger) (window as any).logger.log('SCREEN', `${this.constructor.name} initialized`);
+	}
+	
+	/**
+	 * 获取 UI 安全区域
+	 * 返回考虑工具条等因素后的可用区域
+	 * 
+	 * 安全区域常量：
+	 * - SAFE_AREA_TOP = 50 (工具条高度)
+	 * - SAFE_AREA_BOTTOM = 0
+	 * - SAFE_AREA_LEFT = 0
+	 * - SAFE_AREA_RIGHT = 0
+	 */
+	getSafeArea(): { x: number; y: number; width: number; height: number } {
+		const SAFE_AREA_TOP = 50;
+		const SAFE_AREA_BOTTOM = 0;
+		const SAFE_AREA_LEFT = 0;
+		const SAFE_AREA_RIGHT = 0;
+		return {
+			x: SAFE_AREA_LEFT,
+			y: SAFE_AREA_TOP,
+			width: this.screenWidth - SAFE_AREA_LEFT - SAFE_AREA_RIGHT,
+			height: this.screenHeight - SAFE_AREA_TOP - SAFE_AREA_BOTTOM
+		};
 	}
 
 	_updateScreenSize(): void {

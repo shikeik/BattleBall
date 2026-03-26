@@ -9,18 +9,6 @@
  * - 参考原版 GScreen 设计
  */
 class GScreen {
-    /**
-     * 获取 UI 安全区域
-     * 返回考虑工具条等因素后的可用区域
-     */
-    getSafeArea() {
-        return {
-            x: GScreen.SAFE_AREA_LEFT,
-            y: GScreen.SAFE_AREA_TOP,
-            width: this.screenWidth - GScreen.SAFE_AREA_LEFT - GScreen.SAFE_AREA_RIGHT,
-            height: this.screenHeight - GScreen.SAFE_AREA_TOP - GScreen.SAFE_AREA_BOTTOM
-        };
-    }
     constructor(screenManager) {
         this.initialized = false;
         this.visible = false;
@@ -50,6 +38,28 @@ class GScreen {
         this.initialized = true;
         if (window.logger)
             window.logger.log('SCREEN', `${this.constructor.name} initialized`);
+    }
+    /**
+     * 获取 UI 安全区域
+     * 返回考虑工具条等因素后的可用区域
+     *
+     * 安全区域常量：
+     * - SAFE_AREA_TOP = 50 (工具条高度)
+     * - SAFE_AREA_BOTTOM = 0
+     * - SAFE_AREA_LEFT = 0
+     * - SAFE_AREA_RIGHT = 0
+     */
+    getSafeArea() {
+        const SAFE_AREA_TOP = 50;
+        const SAFE_AREA_BOTTOM = 0;
+        const SAFE_AREA_LEFT = 0;
+        const SAFE_AREA_RIGHT = 0;
+        return {
+            x: SAFE_AREA_LEFT,
+            y: SAFE_AREA_TOP,
+            width: this.screenWidth - SAFE_AREA_LEFT - SAFE_AREA_RIGHT,
+            height: this.screenHeight - SAFE_AREA_TOP - SAFE_AREA_BOTTOM
+        };
     }
     _updateScreenSize() {
         this.screenWidth = window.innerWidth;
@@ -213,11 +223,6 @@ class GScreen {
             window.logger.log('SCREEN', `${this.constructor.name} destroyed`);
     }
 }
-// UI 安全区域常量（工具条高度）
-GScreen.SAFE_AREA_TOP = 50; // 工具条高度
-GScreen.SAFE_AREA_BOTTOM = 0; // 底部安全区域
-GScreen.SAFE_AREA_LEFT = 0; // 左侧安全区域
-GScreen.SAFE_AREA_RIGHT = 0; // 右侧安全区域
 if (typeof window !== 'undefined') {
     window.Screen = GScreen;
 }
