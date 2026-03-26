@@ -76,19 +76,19 @@ const SCRIPT_GROUPS = {
     webgpuDemo: [
         { name: 'WebGPU Demo', src: 'js/webgpu-demo/webgpu-demo.js', weight: 1 },
     ],
-    // 屏幕管理系统
+    // 屏幕管理系统（从 dist 加载编译后的 JS）
     screen: [
-        { name: 'Viewport', src: 'js/screen/viewport.js', weight: 1 },
-        { name: 'Screen Base', src: 'js/screen/screen.js', weight: 1 },
-        { name: 'Screen Manager', src: 'js/screen/screen-manager.js', weight: 1 },
-        { name: 'Selection Screen', src: 'js/screen/selection-screen.js', weight: 1 },
+        { name: 'Viewport', src: 'dist/screen/viewport.js', weight: 1 },
+        { name: 'Screen Base', src: 'dist/screen/screen.js', weight: 1 },
+        { name: 'Screen Manager', src: 'dist/screen/screen-manager.js', weight: 1 },
+        { name: 'Selection Screen', src: 'dist/screen/selection-screen.js', weight: 1 },
     ],
-    // 游戏屏幕（注意加载顺序，被依赖的先加载）
+    // 游戏屏幕（从 dist 加载编译后的 JS）
     screens: [
-        { name: 'WebGPU Screen', src: 'js/screens/webgpu-screen.js', weight: 1 },
-        { name: 'Settings Screen', src: 'js/screens/settings-screen.js', weight: 1 },
-        { name: 'Menu Screen', src: 'js/screens/menu-screen.js', weight: 1 },
-        { name: 'BattleBall Screen', src: 'js/screens/battle-ball-screen.js', weight: 1 },
+        { name: 'WebGPU Screen', src: 'dist/screens/webgpu-screen.js', weight: 1 },
+        { name: 'Settings Screen', src: 'dist/screens/settings-screen.js', weight: 1 },
+        { name: 'Menu Screen', src: 'dist/screens/menu-screen.js', weight: 1 },
+        { name: 'BattleBall Screen', src: 'dist/screens/battle-ball-screen.js', weight: 1 },
     ],
 };
 // 导出
