@@ -163,12 +163,16 @@ class BattleBallScreen extends Screen {
         this.uiViewport.beginWorldRender(ctx);
         const w = this.uiViewport.worldWidth;
         const h = this.uiViewport.worldHeight;
+        // 获取安全区域，避开工具条
+        const safeArea = this.getSafeArea ? this.getSafeArea() : { x: 0, y: 0 };
+        const uiX = safeArea.x + 20;
+        const uiY = safeArea.y + 20;
         // 左上角信息
         ctx.fillStyle = '#ffffff';
         ctx.font = '16px sans-serif';
         ctx.textAlign = 'left';
-        ctx.fillText(`Zoom: ${this.worldCamera.zoom.toFixed(2)}`, 20, 40);
-        ctx.fillText(`Player: (${this.player.x.toFixed(0)}, ${this.player.y.toFixed(0)})`, 20, 65);
+        ctx.fillText(`Zoom: ${this.worldCamera.zoom.toFixed(2)}`, uiX, uiY);
+        ctx.fillText(`Player: (${this.player.x.toFixed(0)}, ${this.player.y.toFixed(0)})`, uiX, uiY + 25);
         // 底部提示
         ctx.fillStyle = '#888888';
         ctx.textAlign = 'center';
