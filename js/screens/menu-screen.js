@@ -63,7 +63,8 @@ class GameScreen extends Screen {
 	
 	_handleClick() {
 		if (window.logger) logger.log('GAME', 'Screen clicked, going back to menu');
-		this.screenManager.replaceScreen(MenuScreen);
+		// 使用 popScreen 返回上一个屏幕
+		this.screenManager.popScreen();
 	}
 	
 	_bindEvents() {
@@ -81,8 +82,9 @@ class GameScreen extends Screen {
 
 	handleBack() {
 		if (window.logger) logger.log('GAME', 'handleBack called');
-		this.screenManager.replaceScreen(MenuScreen);
-		return true;
+		// 使用 popScreen 返回上一个屏幕，而不是 replaceScreen
+		// 这样不会创建新的 MenuScreen 实例，也不会增加栈深度
+		return this.screenManager.popScreen();
 	}
 }
 
