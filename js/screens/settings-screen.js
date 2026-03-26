@@ -139,6 +139,10 @@ class SettingsScreen extends Screen {
 	}
 
 	handleBack() {
+		// 如果栈为空，不拦截返回键（允许退出应用）
+		if (this.screenManager.screenStack.length === 0) {
+			return false;
+		}
 		this.screenManager.popScreen();
 		return true;
 	}

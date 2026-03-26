@@ -229,7 +229,7 @@
 			}
 			loop();
 			
-			// 返回键处理
+			// 返回键处理 - PC 键盘
 			document.addEventListener('keydown', (e) => {
 				if (e.key === 'Escape' || e.key === 'Backspace') {
 					if (window.screenManager && window.screenManager.handleBack()) {
@@ -237,6 +237,29 @@
 					}
 				}
 			});
+			
+			// 物理返回键处理 - 手机
+			// 通过 history API 拦截返回键
+			function setupBackKeyInterceptor() {
+				// 添加一个历史记录点，用于拦截返回键
+				history.pushState({ page: 'game' }, '', location.href);
+				
+				window.addEventListener('popstate', (e) => {
+					// 用户按下了物理返回键
+					if (window.screenManager) {
+						const consumed = window.screenManager.handleBack();
+						if (consumed) {
+							// 屏幕管理器处理了返回，重新添加历史记录点
+							history.pushState({ page: 'game' }, '', location.href);
+						} else {
+							// 栈为空，允许退出（不阻止默认行为）
+							if (window.logger) logger.log('SCREEN', 'Stack empty, allowing exit');
+							history.back();
+						}
+					}
+				});
+			}
+			setupBackKeyInterceptor();
 			
 			if (window.logger) logger.log('SCREEN', 'Screen manager initialized');
 			} catch (e) {
