@@ -542,15 +542,15 @@ class Toolbar {
 	
 	/**
 	 * 相机缩放滑动条变化回调
-	 * @param {string} value - 视野大小系数 1-10
+	 * @param {string} value - 视野大小系数 1-10 (浮点)
 	 */
 	_onCameraZoomChange(value) {
-		const viewScale = parseInt(value);
+		const viewScale = parseFloat(value);
 		
 		// 更新显示值
 		const valueDisplay = document.getElementById('camera-zoom-value');
 		if (valueDisplay) {
-			valueDisplay.textContent = viewScale;
+			valueDisplay.textContent = viewScale.toFixed(2);
 		}
 		
 		// 通知当前屏幕设置相机缩放
@@ -558,7 +558,7 @@ class Toolbar {
 			const screen = window.screenManager.currentScreen;
 			if (screen.setCameraZoom) {
 				screen.setCameraZoom(viewScale);
-				if (window.logger) logger.log('TOOLBAR', `View scale set to ${viewScale}`);
+				if (window.logger) logger.log('TOOLBAR', `View scale set to ${viewScale.toFixed(2)}`);
 			}
 		}
 	}
@@ -621,12 +621,12 @@ class Toolbar {
 			<!-- 相机缩放控制 -->
 			<div style="margin-bottom:20px;">
 				<label style="display:block;margin-bottom:10px;font-size:14px;">视野大小</label>
-				<input type="range" id="camera-zoom-slider" min="1" max="10" step="1" value="1"
+				<input type="range" id="camera-zoom-slider" min="1" max="10" step="0.01" value="1"
 					   style="width:100%;cursor:pointer;"
 					   oninput="window.toolbar._onCameraZoomChange(this.value)">
 				<div style="display:flex;justify-content:space-between;margin-top:5px;font-size:12px;color:#888;">
 					<span>1 (近)</span>
-					<span id="camera-zoom-value">1</span>
+					<span id="camera-zoom-value">1.00</span>
 					<span>10 (远)</span>
 				</div>
 			</div>

@@ -47,7 +47,7 @@ declare class Toolbar {
     toggleDebugPanel(): void;
     /**
      * 相机缩放滑动条变化回调
-     * @param {string} value - 视野大小系数 1-10
+     * @param {string} value - 视野大小系数 1-10 (浮点)
      */
     _onCameraZoomChange(value: string): void;
     createSettingsPanel(): void;
