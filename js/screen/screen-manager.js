@@ -57,17 +57,21 @@ class ScreenManager {
 	 * 进入屏幕（入栈，可返回）
 	 */
 	goScreen(screenClass) {
-		console.log('goScreen:', screenClass.name);
 		const next = this._getOrCreate(screenClass);
-		console.log('got instance:', next.constructor.name);
-
-		// 相同屏幕忽略
-		if (this.currentScreen === next) {
-			console.log('same screen, ignoring');
+		return this._goScreenInstance(next);
+	}
+	
+	/**
+	 * 进入屏幕实例（入栈，可返回）
+	 * 如果已是当前屏幕，直接忽略（幂等操作）
+	 */
+	_goScreenInstance(screen) {
+		// 相同屏幕直接忽略
+		if (this.currentScreen === screen) {
 			return this;
 		}
 
-		this._initializeScreen(next);
+		this._initializeScreen(screen);
 
 		// 隐藏当前并入栈
 		if (this.currentScreen) {
@@ -77,10 +81,10 @@ class ScreenManager {
 			}
 		}
 
-		this.currentScreen = next;
+		this.currentScreen = screen;
 		this.currentScreen.enter();
 
-		if (window.logger) logger.log('SCREEN_MGR', `Go screen: ${next.constructor.name}, stack: [${this.getStackInfo()}]`);
+		if (window.logger) logger.log('SCREEN_MGR', `Go screen: ${screen.constructor.name}, stack: [${this.getStackInfo()}]`);
 		return this;
 	}
 
@@ -106,10 +110,10 @@ class ScreenManager {
 	}
 
 	/**
-	 * 替换屏幕（重新创建）
+	 * 替换屏幕（销毁旧实例，创建新实例）
 	 */
 	replaceScreen(screenClass) {
-		console.log('replaceScreen:', screenClass.name);
+		if (window.logger) logger.log('SCREEN_MGR', `Replace screen: ${screenClass.name}`);
 		// 移除旧实例
 		if (this.screens.has(screenClass)) {
 			const old = this.screens.get(screenClass);
@@ -120,7 +124,8 @@ class ScreenManager {
 	}
 
 	/**
-	 * 返回上个屏幕
+	 * 返回上个屏幕（弹出栈）
+	 * @return true 如果成功返回到栈中的屏幕，false 如果栈为空
 	 */
 	popScreen() {
 		if (this.screenStack.length === 0) {
@@ -130,16 +135,9 @@ class ScreenManager {
 
 		const prev = this.screenStack.pop();
 		this.popping = true;
-
-		if (this.currentScreen) {
-			this.currentScreen.exit();
-		}
-
-		this.currentScreen = prev;
-		this.currentScreen.enter();
-
+		this._goScreenInstance(prev);  // 使用实例版本，不重新创建
 		this.popping = false;
-
+		
 		if (window.logger) logger.log('SCREEN_MGR', `Pop to: ${prev.constructor.name}, stack: [${this.getStackInfo()}]`);
 		return true;
 	}
