@@ -152,14 +152,14 @@ class SettingsScreen extends Screen {
 	}
 
 	_bindEvents() {
-		const viewport = this.getViewport();
-		
 		// 转换屏幕坐标到世界坐标
 		const getPointerPos = (clientX, clientY) => {
+			if (!this.uiViewport) return { x: 0, y: 0 };
+			
 			const rect = this.canvas.getBoundingClientRect();
 			const screenX = clientX - rect.left;
 			const screenY = clientY - rect.top;
-			return viewport.toWorld(screenX, screenY);
+			return this.uiViewport.toWorld(screenX, screenY);
 		};
 		
 		this._onMouseMove = (e) => {
