@@ -45,28 +45,30 @@ class SelectionScreen extends Screen {
 	}
 
 	render(delta) {
+		if (!this.visible) return;
 		if (!this.canvas) return;
 		const ctx = this.canvas.getContext('2d');
 		if (!ctx) return;
-
-		const viewport = this.getViewport();
-		if (!viewport) return;
-
-		// 应用视口变换
-		viewport.apply(ctx);
 		
-		// 开始世界坐标系渲染
-		viewport.beginWorldRender(ctx);
+		// 清空画布
+		ctx.setTransform(1, 0, 0, 1, 0, 0);
+		ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+		ctx.scale(this.dpr, this.dpr);
+		
+		// 使用自己的 UI Viewport
+		if (!this.uiViewport) return;
+		this.uiViewport.apply(ctx);
+		this.uiViewport.beginWorldRender(ctx);
 
 		// 背景
 		ctx.fillStyle = '#1a1a2e';
-		ctx.fillRect(0, 0, viewport.worldWidth, viewport.worldHeight);
+		ctx.fillRect(0, 0, this.uiViewport.worldWidth, this.uiViewport.worldHeight);
 
 		// 绘制按钮列表
-		this._drawButtons(ctx, viewport.worldWidth, viewport.worldHeight);
+		this._drawButtons(ctx, this.uiViewport.worldWidth, this.uiViewport.worldHeight);
 		
 		// 结束世界坐标系渲染
-		viewport.endWorldRender(ctx);
+		this.uiViewport.endWorldRender(ctx);
 	}
 
 	_drawButtons(ctx, w, h) {

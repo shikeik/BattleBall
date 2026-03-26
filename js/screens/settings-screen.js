@@ -23,16 +23,20 @@ class SettingsScreen extends Screen {
 	}
 
 	render(delta) {
+		if (!this.visible) return;
 		if (!this.canvas) return;
 		const ctx = this.canvas.getContext('2d');
 		if (!ctx) return;
-
-		const viewport = this.getViewport();
-		if (!viewport) return;
-
-		// 应用视口变换
-		viewport.apply(ctx);
-		viewport.beginWorldRender(ctx);
+		
+		// 清空画布
+		ctx.setTransform(1, 0, 0, 1, 0, 0);
+		ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+		ctx.scale(this.dpr, this.dpr);
+		
+		// 使用自己的 UI Viewport
+		if (!this.uiViewport) return;
+		this.uiViewport.apply(ctx);
+		this.uiViewport.beginWorldRender(ctx);
 
 		const w = viewport.worldWidth;
 		const h = viewport.worldHeight;
@@ -107,7 +111,7 @@ class SettingsScreen extends Screen {
 		ctx.textAlign = 'center';
 		ctx.fillText('点击设置项切换开关 | 返回键返回', w / 2, h - 30);
 		
-		viewport.endWorldRender(ctx);
+		this.uiViewport.endWorldRender(ctx);
 	}
 
 	_renderBackButton(ctx, w, y) {
