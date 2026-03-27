@@ -104,6 +104,8 @@ const SCRIPT_GROUPS = {
 		{ name: 'WebGPU Screen', src: 'dist/screens/webgpu-screen.js', weight: 1 },
 		{ name: 'Settings Screen', src: 'dist/screens/settings-screen.js', weight: 1 },
 		{ name: 'Menu Screen', src: 'dist/screens/menu-screen.js', weight: 1 },
+		{ name: 'Bean Manager', src: 'js/battle-ball/bean-manager.js', weight: 1 },
+		{ name: 'Joystick', src: 'js/battle-ball/joystick.js', weight: 1 },
 		{ name: 'BattleBall Screen', src: 'dist/screens/battle-ball-screen.js', weight: 1 },
 	],
 };

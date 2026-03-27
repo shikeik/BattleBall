@@ -46,7 +46,11 @@
 	<link rel="stylesheet" href="css/main.css">
 </head>
 <body style="margin:0;padding:0;background:#1a1a2e;overflow:hidden;">
-	<canvas id="gameCanvas" style="display:block;"></canvas>
+	<!-- WebGPU 世界渲染层 -->
+	<canvas id="worldCanvas" style="display:block;position:absolute;top:0;left:0;z-index:1;"></canvas>
+	
+	<!-- 2D UI 渲染层 -->
+	<canvas id="gameCanvas" style="display:block;position:absolute;top:0;left:0;z-index:2;pointer-events:auto;"></canvas>
 	
 	<!-- UI层：初始隐藏，加载完成后显示 -->
 	<div id="ui-layer" style="visibility: hidden;">
