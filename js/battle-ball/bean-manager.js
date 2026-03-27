@@ -293,3 +293,4 @@ class BeanManager {
 }
 
 window.BeanManager = BeanManager;
+// test3
