@@ -63,6 +63,8 @@ class MenuScreen extends GScreen {
 		// 清空画布
 		ctx.setTransform(1, 0, 0, 1, 0, 0);
 		ctx.clearRect(0, 0, canvas.width, canvas.height);
+		
+		// 使用 DPR 缩放使绘制使用 CSS 像素坐标
 		ctx.scale(this.dpr, this.dpr);
 		
 		// 背景

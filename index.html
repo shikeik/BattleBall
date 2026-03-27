@@ -171,14 +171,6 @@
 				return;
 			}
 			
-			// 设置 canvas 填满视口
-			function resizeCanvas() {
-				canvas.style.width = '100vw';
-				canvas.style.height = '100vh';
-			}
-			resizeCanvas();
-			window.addEventListener('resize', resizeCanvas);
-			
 			if (!window.ScreenManager || !window.Viewport) {
 				if (window.logger) logger.log('SCREEN', 'ScreenManager or Viewport not loaded');
 				return;

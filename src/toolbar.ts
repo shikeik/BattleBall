@@ -467,10 +467,8 @@ class Toolbar {
 				if ((window as any).logger) (window as any).logger.log('TOOLBAR', '退出全屏');
 			}
 			
-			// 延迟触发 resize，等待屏幕尺寸稳定（全屏切换可能需要更长时间）
-			setTimeout(() => {
-				this._notifyResize();
-			}, 500);
+			// 全屏切换会自然触发 window resize 事件，不需要手动调用
+			// GScreen._onResize 会自动处理
 			
 		} catch (e) {
 			console.log('全屏切换失败:', e);
@@ -509,10 +507,8 @@ class Toolbar {
 				}
 			}
 			
-			// 延迟触发 resize，等待屏幕尺寸稳定
-			setTimeout(() => {
-				this._notifyResize();
-			}, 500);
+			// 转屏会自然触发 window resize 事件，不需要手动调用
+			// GScreen._onResize 会自动处理
 			
 		} catch (e) {
 			if ((window as any).logger) (window as any).logger.log('TOOLBAR', `转屏失败: ${e.message}`);
@@ -522,20 +518,11 @@ class Toolbar {
 	
 	/**
 	 * 通知当前屏幕触发 resize 处理
-	 * 用于全屏切换后的强制刷新
+	 * @deprecated 全屏/转屏会自动触发 window resize 事件，不再需要手动通知
 	 */
 	_notifyResize() {
-		// 通知当前屏幕
-		if (window.screenManager && window.screenManager.currentScreen) {
-			const screen = window.screenManager.currentScreen;
-			if (screen.resize) {
-				screen.resize();
-				if ((window as any).logger) (window as any).logger.log('TOOLBAR', 'Notified current screen to resize');
-			}
-		}
-		
-		// 同时触发全局 resize 事件（让其他监听者也能收到）
-		window.dispatchEvent(new Event('resize'));
+		// 已废弃：window resize 事件会自动处理
+		if ((window as any).logger) (window as any).logger.log('TOOLBAR', '_notifyResize is deprecated');
 	}
 	
 	// 切换设置面板

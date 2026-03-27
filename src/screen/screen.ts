@@ -19,7 +19,6 @@ class GScreen {
 	
 	// resize 事件处理
 	private _resizeHandler: (() => void) | null = null;
-	private _resizeTimeout: number | null = null;
 	
 	// canvas 引用（子类可通过 getCanvas() 获取）
 	protected _canvas: HTMLCanvasElement | null = null;
@@ -43,7 +42,7 @@ class GScreen {
 		this._updateCanvasSize();
 		this.init();
 		this.initialized = true;
-		if (window.logger) window.logger.log('SCREEN', `${this.constructor.name} initialized`);
+		if ((window as any).logger) (window as any).logger.log('SCREEN', `${this.constructor.name} initialized`);
 	}
 	
 	/**
@@ -70,9 +69,26 @@ class GScreen {
 	}
 
 	_updateScreenSize(): void {
-		this.screenWidth = window.innerWidth;
-		this.screenHeight = window.innerHeight;
+		const oldW = this.screenWidth;
+		const oldH = this.screenHeight;
+		
+		// 使用 visualViewport 获取实际可视区域尺寸（处理浏览器差异）
+		// Edge 非全屏时 window.innerHeight 和 100vh 可能不一致
+		const vv = (window as any).visualViewport;
+		if (vv) {
+			// visualViewport 返回的是 CSS 像素，需要考虑缩放
+			this.screenWidth = vv.width;
+			this.screenHeight = vv.height;
+		} else {
+			this.screenWidth = window.innerWidth;
+			this.screenHeight = window.innerHeight;
+		}
+		
 		this.dpr = window.devicePixelRatio || 1;
+		
+		if ((window as any).logger && (oldW !== this.screenWidth || oldH !== this.screenHeight)) {
+			(window as any).logger.log('RESIZE_DBG', `Size: ${oldW}x${oldH} -> ${this.screenWidth}x${this.screenHeight}`);
+		}
 	}
 
 	/**
@@ -89,21 +105,30 @@ class GScreen {
 	/**
 	 * 更新 canvas 尺寸
 	 * 基类统一管理，子类不需要处理
+	 * 
+	 * 注意：CSS 已设置 canvas 为 100vw/100vh，此处只更新实际像素尺寸
 	 */
 	protected _updateCanvasSize(): void {
 		const canvas = this.getCanvas();
 		if (!canvas) return;
 		
-		// 设置 canvas 的 CSS 尺寸（逻辑像素）
-		canvas.style.width = this.screenWidth + 'px';
-		canvas.style.height = this.screenHeight + 'px';
+		// 获取 canvas 实际渲染尺寸（CSS 像素）
+		const rect = canvas.getBoundingClientRect();
+		const cssWidth = rect.width;
+		const cssHeight = rect.height;
 		
-		// 设置 canvas 的实际尺寸（物理像素，考虑 DPR）
-		canvas.width = Math.floor(this.screenWidth * this.dpr);
-		canvas.height = Math.floor(this.screenHeight * this.dpr);
+		// 根据实际渲染尺寸计算内部像素尺寸
+		const newWidth = Math.floor(cssWidth * this.dpr);
+		const newHeight = Math.floor(cssHeight * this.dpr);
 		
-		if (window.logger) {
-			window.logger.log('SCREEN', `Canvas resized: ${canvas.width}x${canvas.height} (DPR: ${this.dpr})`);
+		// 只在尺寸变化时才更新
+		if (canvas.width !== newWidth || canvas.height !== newHeight) {
+			canvas.width = newWidth;
+			canvas.height = newHeight;
+			
+			if ((window as any).logger) {
+				(window as any).logger.log('SCREEN', `Canvas resized: ${newWidth}x${newHeight} (CSS: ${cssWidth.toFixed(1)}x${cssHeight.toFixed(1)})`);
+			}
 		}
 	}
 
@@ -136,8 +161,8 @@ class GScreen {
 			// 方向改变，更新 Viewport 的 world 尺寸
 			this.uiViewport.updateOrientation(isLandscape);
 			
-			if (window.logger) {
-				window.logger.log('SCREEN', `Viewport orientation updated: ${isLandscape ? 'landscape' : 'portrait'}`);
+			if ((window as any).logger) {
+				(window as any).logger.log('SCREEN', `Viewport orientation updated: ${isLandscape ? 'landscape' : 'portrait'}`);
 			}
 		}
 	}
@@ -159,18 +184,20 @@ class GScreen {
 		// 更新 Viewport 方向（如果需要）
 		this._updateViewportOrientation();
 		
-		// 更新 Viewport 和 canvas 尺寸
+		// 更新 Viewport（但不重复更新 canvas，因为 initialize 已经做了）
 		if (this.uiViewport) {
 			this.uiViewport.update(this.screenWidth, this.screenHeight, this.dpr);
 		}
-		this._updateCanvasSize();
+		
+		// 注意：不再调用 _updateCanvasSize()，因为 initialize() 已经调用过了
+		// 如果需要强制刷新，可以调用 resize() 方法
 		
 		// 绑定 resize 事件监听
+		// 注意：orientationchange 会触发 resize，不需要单独监听
 		this._resizeHandler = () => this._onResize();
 		window.addEventListener('resize', this._resizeHandler);
-		window.addEventListener('orientationchange', this._resizeHandler);
 		
-		if (window.logger) window.logger.log('SCREEN', `${this.constructor.name} enter`);
+		if ((window as any).logger) (window as any).logger.log('SCREEN', `${this.constructor.name} enter`);
 	}
 	
 	exit(): void {
@@ -179,17 +206,16 @@ class GScreen {
 		// 移除 resize 事件监听
 		if (this._resizeHandler) {
 			window.removeEventListener('resize', this._resizeHandler);
-			window.removeEventListener('orientationchange', this._resizeHandler);
 			this._resizeHandler = null;
 		}
 		
-		// 清除 resize 防抖定时器
+		// 清除防抖定时器
 		if (this._resizeTimeout) {
 			clearTimeout(this._resizeTimeout);
 			this._resizeTimeout = null;
 		}
 		
-		if (window.logger) window.logger.log('SCREEN', `${this.constructor.name} exit`);
+		if ((window as any).logger) (window as any).logger.log('SCREEN', `${this.constructor.name} exit`);
 	}
 	
 	render(delta: number): void {}
@@ -203,47 +229,48 @@ class GScreen {
 		// 子类可覆盖此方法处理额外的转屏逻辑
 	}
 	
+	// resize 防抖定时器
+	private _resizeTimeout: number | null = null;
+	
 	/**
 	 * 内部 resize 处理
 	 * 统一处理 Viewport、canvas、世界相机的更新
 	 */
 	private _onResize(): void {
-		// 延迟执行，等待屏幕尺寸稳定（全屏切换需要更长时间）
+		// 防抖：清除之前的定时器
 		if (this._resizeTimeout) {
 			clearTimeout(this._resizeTimeout);
 		}
 		
+		// 延迟执行，等待屏幕尺寸稳定（ orientationchange 需要更长时间）
 		this._resizeTimeout = window.setTimeout(() => {
 			this._resizeTimeout = null;
 			
-			// 使用 requestAnimationFrame 确保在下一帧渲染前更新
-			requestAnimationFrame(() => {
-				this._updateScreenSize();
-				
-				// 更新 Viewport 方向（如果需要）
-				this._updateViewportOrientation();
-				
-				// 更新 Viewport
-				if (this.uiViewport) {
-					this.uiViewport.update(this.screenWidth, this.screenHeight, this.dpr);
-				}
-				
-				// 更新 canvas 尺寸（基类统一管理）
-				this._updateCanvasSize();
-				
-				// 更新世界相机
-				this.worldCamera.width = this.screenWidth;
-				this.worldCamera.height = this.screenHeight;
-				
-				// 调用子类的 onResize
-				this.onResize();
-				
-				const isLandscape = this.screenWidth > this.screenHeight;
-				if (window.logger) {
-					window.logger.log('SCREEN', `Resized to ${this.screenWidth}x${this.screenHeight} (${isLandscape ? 'landscape' : 'portrait'})`);
-				}
-			});
-		}, 200); // 增加到 200ms，确保全屏切换完成
+			this._updateScreenSize();
+			
+			// 更新 Viewport 方向（如果需要）
+			this._updateViewportOrientation();
+			
+			// 更新 Viewport
+			if (this.uiViewport) {
+				this.uiViewport.update(this.screenWidth, this.screenHeight, this.dpr);
+			}
+			
+			// 更新 canvas 尺寸（基类统一管理）
+			this._updateCanvasSize();
+			
+			// 更新世界相机
+			this.worldCamera.width = this.screenWidth;
+			this.worldCamera.height = this.screenHeight;
+			
+			// 调用子类的 onResize
+			this.onResize();
+			
+			const isLandscape = this.screenWidth > this.screenHeight;
+			if ((window as any).logger) {
+				(window as any).logger.log('SCREEN', `Resized to ${this.screenWidth}x${this.screenHeight} (${isLandscape ? 'landscape' : 'portrait'})`);
+			}
+		}, 100);
 	}
 	
 	/**
@@ -276,10 +303,10 @@ class GScreen {
 	
 	destroy(): void {
 		this.initialized = false;
-		if (window.logger) window.logger.log('SCREEN', `${this.constructor.name} destroyed`);
+		if ((window as any).logger) (window as any).logger.log('SCREEN', `${this.constructor.name} destroyed`);
 	}
 }
 
 if (typeof window !== 'undefined') {
-	window.Screen = GScreen;
+	(window as any).Screen = GScreen;
 }

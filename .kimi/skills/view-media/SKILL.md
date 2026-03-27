@@ -11,7 +11,7 @@ description: 查看手机截图、视频和日志文件。当用户说"看截图
 |------|------|
 | 截图 | `/storage/emulated/0/DCIM/Screenshots/*.jpg` |
 | 视频/录屏 | `/storage/emulated/0/DCIM/ScreenRecorder/*.mp4` |
-| 日志 | `/storage/emulated/0/Download/game-log*.log` |
+| 日志 | `/storage/emulated/0/Download/game-log*.txt` |
 
 ## 使用方法
 
@@ -39,7 +39,7 @@ ReadMediaFile <path>
 
 ```bash
 # 查找最新日志
-ls -t /storage/emulated/0/Download/game-log*.log | head -1
+ls -t /storage/emulated/0/Download/game-log*.txt | head -1
 
 # 读取内容
 cat <path> | head -100
@@ -62,7 +62,7 @@ ReadMediaFile({ path: latestVideo.trim() });
 
 // 获取最新日志
 const latestLog = Shell({
-  command: "ls -t /storage/emulated/0/Download/game-log*.log | head -1"
+  command: "ls -t /storage/emulated/0/Download/game-log*.txt | head -1"
 });
 ReadFile({ path: latestLog.trim(), n_lines: 100 });
 ```
