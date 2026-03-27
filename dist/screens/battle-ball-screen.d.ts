@@ -16,6 +16,7 @@ declare class BattleBallScreen extends Screen {
     player: {
         x: number;
         y: number;
+        score: number;
         radius: number;
         color: string;
     } | undefined;
@@ -27,7 +28,6 @@ declare class BattleBallScreen extends Screen {
     eatCooldownTime: number | undefined;
     /**
      * 初始化世界相机
-     * 覆盖父类方法，使用自定义相机
      */
     _initWorldCamera(): void;
     worldCamera: {
@@ -39,7 +39,7 @@ declare class BattleBallScreen extends Screen {
     } | undefined;
     enter(): void;
     /**
-     * 初始化相机缩放 - 读取工具条的视野大小设置
+     * 初始化相机缩放
      */
     _initCameraZoom(): void;
     /**
@@ -49,15 +49,15 @@ declare class BattleBallScreen extends Screen {
     exit(): void;
     render(delta: any): void;
     /**
-     * 使用 WebGPU 渲染世界（彩豆）
+     * 渲染世界（WebGPU）
      */
     _renderWorld(): void;
     /**
-     * 使用 2D Canvas 渲染游戏 UI（网格、边界、玩家、摇杆）
+     * 渲染游戏 UI
      */
     _renderGameUI(ctx: any): void;
     /**
-     * 绘制网格（只绘制视口内的部分）
+     * 绘制网格
      */
     _renderGrid(ctx: any, viewW: any, viewH: any): void;
     /**
@@ -69,25 +69,17 @@ declare class BattleBallScreen extends Screen {
      */
     _renderPlayer(ctx: any): void;
     /**
-     * 绘制彩豆
-     */
-    _renderBeans(): void;
-    /**
-     * 绘制 UI（使用 UI Viewport 坐标系）
+     * 绘制 UI
      */
     _renderUI(ctx: any): void;
     /**
      * 设置相机缩放
-     * @param {number} viewScale - 视野大小系数 (1-10)
-     *   1 = 3x 放大效果（近距离）
-     *   10 = 总览全图甚至更大（远距离）
      */
-    setCameraZoom(viewScale: number): void;
+    setCameraZoom(viewScale: any): void;
     /**
      * resize 回调
-     * 基类已经处理了 Viewport 和 canvas 尺寸更新
-     * 这里只需要处理世界相机的特殊逻辑
-     */ onResize(): void;
+     */
+    onResize(): void;
     /**
      * 初始化摇杆
      */
@@ -101,12 +93,10 @@ declare class BattleBallScreen extends Screen {
      */
     _checkEatBeans(delta: any): void;
     /**
-     * 绑定事件
+     * 积分转半径
      */
+    _scoreToRadius(score: any): number;
     _bindEvents(): void;
-    /**
-     * 解绑事件
-     */
     _unbindEvents(): void;
     handleBack(): any;
 }
