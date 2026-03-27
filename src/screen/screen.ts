@@ -19,6 +19,7 @@ class GScreen {
 	
 	// resize 事件处理
 	private _resizeHandler: (() => void) | null = null;
+	private _resizeTimeout: number | null = null;
 	
 	// canvas 引用（子类可通过 getCanvas() 获取）
 	protected _canvas: HTMLCanvasElement | null = null;
@@ -182,6 +183,12 @@ class GScreen {
 			this._resizeHandler = null;
 		}
 		
+		// 清除 resize 防抖定时器
+		if (this._resizeTimeout) {
+			clearTimeout(this._resizeTimeout);
+			this._resizeTimeout = null;
+		}
+		
 		if (window.logger) window.logger.log('SCREEN', `${this.constructor.name} exit`);
 	}
 	
@@ -201,33 +208,42 @@ class GScreen {
 	 * 统一处理 Viewport、canvas、世界相机的更新
 	 */
 	private _onResize(): void {
-		// 延迟执行，等待屏幕尺寸稳定
-		setTimeout(() => {
-			this._updateScreenSize();
+		// 延迟执行，等待屏幕尺寸稳定（全屏切换需要更长时间）
+		if (this._resizeTimeout) {
+			clearTimeout(this._resizeTimeout);
+		}
+		
+		this._resizeTimeout = window.setTimeout(() => {
+			this._resizeTimeout = null;
 			
-			// 更新 Viewport 方向（如果需要）
-			this._updateViewportOrientation();
-			
-			// 更新 Viewport
-			if (this.uiViewport) {
-				this.uiViewport.update(this.screenWidth, this.screenHeight, this.dpr);
-			}
-			
-			// 更新 canvas 尺寸（基类统一管理）
-			this._updateCanvasSize();
-			
-			// 更新世界相机
-			this.worldCamera.width = this.screenWidth;
-			this.worldCamera.height = this.screenHeight;
-			
-			// 调用子类的 onResize
-			this.onResize();
-			
-			const isLandscape = this.screenWidth > this.screenHeight;
-			if (window.logger) {
-				window.logger.log('SCREEN', `Resized to ${this.screenWidth}x${this.screenHeight} (${isLandscape ? 'landscape' : 'portrait'})`);
-			}
-		}, 100);
+			// 使用 requestAnimationFrame 确保在下一帧渲染前更新
+			requestAnimationFrame(() => {
+				this._updateScreenSize();
+				
+				// 更新 Viewport 方向（如果需要）
+				this._updateViewportOrientation();
+				
+				// 更新 Viewport
+				if (this.uiViewport) {
+					this.uiViewport.update(this.screenWidth, this.screenHeight, this.dpr);
+				}
+				
+				// 更新 canvas 尺寸（基类统一管理）
+				this._updateCanvasSize();
+				
+				// 更新世界相机
+				this.worldCamera.width = this.screenWidth;
+				this.worldCamera.height = this.screenHeight;
+				
+				// 调用子类的 onResize
+				this.onResize();
+				
+				const isLandscape = this.screenWidth > this.screenHeight;
+				if (window.logger) {
+					window.logger.log('SCREEN', `Resized to ${this.screenWidth}x${this.screenHeight} (${isLandscape ? 'landscape' : 'portrait'})`);
+				}
+			});
+		}, 200); // 增加到 200ms，确保全屏切换完成
 	}
 	
 	/**
