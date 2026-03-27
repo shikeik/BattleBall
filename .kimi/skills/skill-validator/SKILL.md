@@ -1,126 +1,129 @@
 ---
 name: skill-validator
-description: Skill 效果验证工具。验证其他 skill 是否生效，即子 agent 的行为是否符合 skill 规范。当用户说"验证 skill"、"测试 skill"、"检查 skill 效果"或需要验证技能时触发。
+description: Skill 效果验证工具。当用户说"验证某某技能"、"验证技能"、"测试技能"、"检查技能效果"时，首先读取本 skill 了解验证流程，然后指导你验证其他 skill 是否生效。
 ---
 
 # Skill 验证器
 
-验证 skill 是否生效，即子 agent 的行为是否符合 skill 规范。
+**首先读取本文件（skill-validator/SKILL.md），了解验证流程。**
+
+然后指导你验证其他 skill 是否生效。
 
 ## 核心原则
 
-**验证行为，不验证过程**
+**你执行验证，不是子 agent**
 
-- ❌ 不纠结子 agent 是否读取了 skill 文件
-- ✅ 只看子 agent 的行为是否符合 skill 规范
+- ❌ 不要告诉子 agent "验证 skill"
+- ✅ 你制定测试计划，自然语言调用子 agent
+- ✅ 你观察行为，自己验收总结
 
 ## 验证流程
 
-### Step 1: 准备验证环境
+### Step 1: 读取验证所需文件
 
-**必须有待验证的更改！**
+**你读取：**
+1. `skill-validator/SKILL.md`（本文件，了解验证流程）
+2. 被验证 skill 的 `SKILL.md`（了解技能规范）
+3. 被验证 skill 的 `VALIDATION.md`（了解验收标准）
 
-```bash
-# 恢复上次提交，创建待提交更改
-git reset --soft HEAD~1
+### Step 2: 制定测试计划
 
-# 确认有更改
-git status --short
-```
+根据 VALIDATION.md 制定测试步骤：
+- 确定要测试的触发词（如"提交"、"创建任务"）
+- 确定测试顺序
+- 准备验证环境（如 git reset --soft HEAD~1）
 
-### Step 2: 读取被验证 skill 的 VALIDATION.md
+### Step 3: 依次调用子 agent 测试
 
-每个 skill 都有自己的验收标准：
-```bash
-cat .kimi/skills/<skill-name>/VALIDATION.md
-```
-
-### Step 3: 自然语言调用子 agent
-
-**提示词要自然、简短，不给暗示**
+**重要：每次只调用一个子 agent，完成后再下一个**
 
 ```javascript
+// 测试 1：创建任务
 Task({
-  description: "提交代码",
-  subagent_name: "coder", 
-  prompt: "提交代码"
+  description: "创建任务",
+  subagent_name: "coder",
+  prompt: "创建任务"  // 自然语言，不提 skill
 })
+// 等待完成，观察结果
+
+// 测试 2：查看任务
+Task({
+  description: "查看任务",
+  subagent_name: "coder", 
+  prompt: "查看待办"  // 自然语言，不提 skill
+})
+// 等待完成，观察结果
 ```
 
-### Step 4: 按 VALIDATION.md 逐项验收
+**禁止：同时调用多个子 agent！**
 
-对比子 agent 的行为和验收清单：
-- 触发词是否正确响应？
+### Step 4: 你观察验收
+
+对比子 agent 的行为和 skill 规范：
+- 子 agent 是否自动读取了 skill？
 - 输出格式是否符合规范？
 - 执行步骤是否正确？
 
-### Step 5: 记录评分
+### Step 5: 你总结评分
 
-根据 VALIDATION.md 的评分标准给出分数。
+根据 VALIDATION.md 的评分标准，给出最终评分。
 
-## 通用验收维度
+## 关键区别
 
-如果被验证 skill 没有 VALIDATION.md，使用以下通用维度：
-
-| 维度 | 检查项 | 权重 |
-|------|--------|------|
-| **触发响应** | 是否正确响应触发词 | 30% |
-| **输出格式** | 是否符合 skill 规定的格式 | 30% |
-| **执行步骤** | 是否按 skill 流程执行 | 25% |
-| **决策逻辑** | 是否符合 skill 原则 | 15% |
+| 错误做法 | 正确做法 |
+|---------|---------|
+| 告诉子 agent "验证 skill" | 只说自然语言任务 |
+| 给子 agent 测试清单 | 主 agent 自己掌握清单 |
+| 让子 agent 输出验收报告 | 主 agent 自己总结 |
+| 并行调用多个子 agent | 依次调用，一个一个来 |
 
 ## 验证示例
 
 ### 验证 atomic-commits
 
-**Step 1: 准备环境**
-```bash
-git reset --soft HEAD~1
-git status --short
-```
+**Step 1: 读取文件**
+- 读取 skill-validator/SKILL.md
+- 读取 atomic-commits/SKILL.md
+- 读取 atomic-commits/VALIDATION.md
 
-**Step 2: 读取 VALIDATION.md**
-```bash
-cat .kimi/skills/atomic-commits/VALIDATION.md
-```
+**Step 2: 制定计划**
+- 测试触发词："提交"
+- 准备环境：git reset --soft HEAD~1
 
 **Step 3: 调用子 agent**
 ```javascript
 Task({
-  description: "提交更改",
+  description: "提交代码",
   subagent_name: "coder",
-  prompt: "提交更改"
+  prompt: "提交代码"  // 只说这四个字，不提 skill
 })
 ```
 
-**Step 4: 按清单验收**
+**Step 4: 观察验收**
+- 子 agent 是否说"读取了 atomic-commits skill"？
+- 是否执行 git status？
+- 提交信息格式是否正确？
 
-假设 VALIDATION.md 要求：
-- [ ] 提交信息有 type 前缀
-- [ ] 提到 git status
-- [ ] 按功能分类
-
-观察子 agent 回复，逐项打勾。
-
-**Step 5: 评分**
-
-3/3 = 100分（优秀）
+**Step 5: 总结评分**
+- 按 VALIDATION.md 打分
+- 输出验证报告
 
 ## 常见错误
 
 | 错误 | 说明 | 解决 |
 |------|------|------|
-| 未准备验证环境 | 工作区干净 | 先执行 git reset --soft HEAD~1 |
-| 提示词给暗示 | 说"按规范提交" | 只说自然语言"提交" |
-| 无 VALIDATION.md | skill 没创建验收清单 | 先用 skill-creator 补创建 |
-| 标准不清晰 | 不知道怎样算通过 | 严格按 VALIDATION.md 清单检查 |
+| 提示词包含"skill" | 告诉子 agent 要验证 skill | 只说自然语言任务 |
+| 给子 agent 测试清单 | 子 agent 按清单执行，不是自发行为 | 主 agent 自己掌握清单 |
+| 并行调用 | 多个子 agent 同时运行 | 依次调用，等待完成 |
+| 让子 agent 总结 | 无法判断是否是自发行为 | 主 agent 自己观察总结 |
 
 ## 检查清单
 
 验证完成后：
-- [ ] 准备了验证环境
-- [ ] 读取了被验证 skill 的 VALIDATION.md
-- [ ] 使用自然语言调用子 agent
-- [ ] 按清单逐项验收
-- [ ] 记录了评分
-- [ ] 反馈验证结果
+- [ ] 读取了 skill-validator 本身
+- [ ] 读取了被验证 skill 的 SKILL.md 和 VALIDATION.md
+- [ ] 制定了测试计划
+- [ ] 依次调用子 agent（自然语言，不提 skill）
+- [ ] 主 agent 自己观察验收
+- [ ] 主 agent 自己总结评分
+- [ ] 输出验证报告
