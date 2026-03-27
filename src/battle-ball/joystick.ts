@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * Joystick - 虚拟摇杆
  * 用于控制玩家移动

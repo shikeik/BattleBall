@@ -1,20 +1,33 @@
-// @ts-nocheck
 /**
  * 顶部工具栏 - 分页管理版
  * 支持多页工具菜单，横向滑动翻页
  */
 
 class Toolbar {
+	private currentPage: number;
+	private totalPages: number;
+	private buttonsPerPage: number;
+	private allButtons: any[];
+	private container: HTMLDivElement | null;
+	private track: HTMLDivElement | null;
+	private pageIndicator: HTMLDivElement | null;
+	private touchStartX: number;
+	private isDragging: boolean;
+	private dragOffset: number;
+	private _zoomStartValue: number;
+
 	constructor() {
 		this.currentPage = 0;
 		this.totalPages = 2;
 		this.buttonsPerPage = 8;
 		this.allButtons = [];
 		this.container = null;
+		this.track = null;
 		this.pageIndicator = null;
 		this.touchStartX = 0;
 		this.isDragging = false;
 		this.dragOffset = 0;
+		this._zoomStartValue = 0;
 		
 		this.init();
 	}
@@ -183,7 +196,7 @@ class Toolbar {
 					page: page,
 					indexInPage: indexInPage,
 					onClick: () => {
-						if (window.logger) logger.log('TOOLBAR', `空按钮 P${page}-${indexInPage} 被点击`);
+						if ((window as any).logger) (window as any).logger.log('TOOLBAR', `空按钮 P${page}-${indexInPage} 被点击`);
 					}
 				});
 				emptyIndex++;
@@ -396,7 +409,7 @@ class Toolbar {
 			this.currentPage++;
 			this.updateSlidePosition();
 			this.updatePageIndicator();
-			if (window.logger) logger.log('TOOLBAR', `切换到第 ${this.currentPage + 1} 页`);
+			if ((window as any).logger) (window as any).logger.log('TOOLBAR', `切换到第 ${this.currentPage + 1} 页`);
 		}
 	}
 	
@@ -406,7 +419,7 @@ class Toolbar {
 			this.currentPage--;
 			this.updateSlidePosition();
 			this.updatePageIndicator();
-			if (window.logger) logger.log('TOOLBAR', `切换到第 ${this.currentPage + 1} 页`);
+			if ((window as any).logger) (window as any).logger.log('TOOLBAR', `切换到第 ${this.currentPage + 1} 页`);
 		}
 	}
 	
@@ -423,7 +436,7 @@ class Toolbar {
 	
 	// 返回按钮 - 调用屏幕管理器
 	goBack() {
-		if (window.logger) logger.log('TOOLBAR', 'Back button clicked');
+		if ((window as any).logger) (window as any).logger.log('TOOLBAR', 'Back button clicked');
 		
 		// 优先关闭面板
 		const settingsPanel = document.getElementById('settings-panel');
@@ -448,10 +461,10 @@ class Toolbar {
 		try {
 			if (!document.fullscreenElement) {
 				await document.documentElement.requestFullscreen();
-				if (window.logger) logger.log('TOOLBAR', '进入全屏');
+				if ((window as any).logger) (window as any).logger.log('TOOLBAR', '进入全屏');
 			} else {
 				await document.exitFullscreen();
-				if (window.logger) logger.log('TOOLBAR', '退出全屏');
+				if ((window as any).logger) (window as any).logger.log('TOOLBAR', '退出全屏');
 			}
 			
 			// 延迟触发 resize，等待屏幕尺寸稳定（全屏切换可能需要更长时间）
@@ -468,31 +481,31 @@ class Toolbar {
 	async toggleOrientation() {
 		try {
 			if (!screen.orientation) {
-				if (window.logger) logger.log('TOOLBAR', '当前设备不支持屏幕方向锁定');
+				if ((window as any).logger) (window as any).logger.log('TOOLBAR', '当前设备不支持屏幕方向锁定');
 				return;
 			}
 			
 			// 使用 window.innerWidth/Height 判断当前方向更准确
 			const isLandscape = window.innerWidth > window.innerHeight;
 			
-			if (window.logger) logger.log('TOOLBAR', `当前方向: ${isLandscape ? '横屏' : '竖屏'}, 准备切换...`);
+			if ((window as any).logger) (window as any).logger.log('TOOLBAR', `当前方向: ${isLandscape ? '横屏' : '竖屏'}, 准备切换...`);
 			
 			let lockResult;
 			if (isLandscape) {
 				// 当前是横屏，切换到竖屏
 				lockResult = await screen.orientation.lock('portrait').catch((e) => e);
 				if (lockResult instanceof Error) {
-					if (window.logger) logger.log('TOOLBAR', `切换到竖屏失败: ${lockResult.message}`);
+					if ((window as any).logger) (window as any).logger.log('TOOLBAR', `切换到竖屏失败: ${lockResult.message}`);
 				} else {
-					if (window.logger) logger.log('TOOLBAR', '切换到竖屏成功');
+					if ((window as any).logger) (window as any).logger.log('TOOLBAR', '切换到竖屏成功');
 				}
 			} else {
 				// 当前是竖屏，切换到横屏
 				lockResult = await screen.orientation.lock('landscape').catch((e) => e);
 				if (lockResult instanceof Error) {
-					if (window.logger) logger.log('TOOLBAR', `切换到横屏失败: ${lockResult.message}`);
+					if ((window as any).logger) (window as any).logger.log('TOOLBAR', `切换到横屏失败: ${lockResult.message}`);
 				} else {
-					if (window.logger) logger.log('TOOLBAR', '切换到横屏成功');
+					if ((window as any).logger) (window as any).logger.log('TOOLBAR', '切换到横屏成功');
 				}
 			}
 			
@@ -502,7 +515,7 @@ class Toolbar {
 			}, 500);
 			
 		} catch (e) {
-			if (window.logger) logger.log('TOOLBAR', `转屏失败: ${e.message}`);
+			if ((window as any).logger) (window as any).logger.log('TOOLBAR', `转屏失败: ${e.message}`);
 			console.log('转屏失败:', e);
 		}
 	}
@@ -517,7 +530,7 @@ class Toolbar {
 			const screen = window.screenManager.currentScreen;
 			if (screen.resize) {
 				screen.resize();
-				if (window.logger) logger.log('TOOLBAR', 'Notified current screen to resize');
+				if ((window as any).logger) (window as any).logger.log('TOOLBAR', 'Notified current screen to resize');
 			}
 		}
 		
@@ -581,7 +594,7 @@ class Toolbar {
 	 */
 	_onCameraZoomEnd(value) {
 		const viewScale = parseFloat(value);
-		if (window.logger) logger.log('TOOLBAR', `View scale set to ${viewScale.toFixed(2)}`);
+		if ((window as any).logger) (window as any).logger.log('TOOLBAR', `View scale set to ${viewScale.toFixed(2)}`);
 	}
 	
 	// 创建设置面板

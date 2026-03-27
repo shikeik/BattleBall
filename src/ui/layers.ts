@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * UI 层级管理系统
  * 集中管理所有UI元素的z-index，避免冲突
@@ -139,11 +138,11 @@ const UILayers = {
 };
 
 // 导出
-window.UILayers = UILayers;
+(window as any).UILayers = UILayers;
 
 // 自动初始化CSS变量
 document.addEventListener('DOMContentLoaded', () => {
 	UILayers.initCSSVariables();
 });
 
-if (window.logger) logger.log('module', 'ui-layers loaded');
+if ((window as any).logger) (window as any).logger.log('module', 'ui-layers loaded');

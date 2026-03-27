@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * 性能监控器 - 简化版
  * 实时显示 FPS
@@ -98,7 +97,7 @@ class PerfMonitor {
 		if (this.panel) {
 			this.panel.style.display = this.enabled ? 'block' : 'none';
 		}
-		if (window.logger) logger.log('PERF', this.enabled ? '性能面板已开启' : '性能面板已关闭');
+		if (window.logger) window.logger.log('PERF', this.enabled ? '性能面板已开启' : '性能面板已关闭');
 	}
 }
 

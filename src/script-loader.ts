@@ -1,12 +1,13 @@
-// @ts-nocheck
 /**
  * 脚本加载器
  * 动态加载 JS 文件，支持进度回调
  */
 
 class ScriptLoader {
+	private cacheBuster: number;
+
 	constructor() {
-		this.cacheBuster = window.CACHE_BUSTER || Date.now();
+		this.cacheBuster = (window as any).CACHE_BUSTER || Date.now();
 	}
 	
 	/**
@@ -28,13 +29,13 @@ class ScriptLoader {
 			}
 			
 			script.onload = () => {
-				if (window.logger) logger.log('LOADER', 'Script loaded', { src });
+				if ((window as any).logger) (window as any).logger.log('LOADER', 'Script loaded', { src });
 				resolve(src);
 			};
 			
 			script.onerror = () => {
 				console.error('Failed to load:', src);
-				if (window.logger) logger.log('LOADER', 'Script failed', { src });
+				if ((window as any).logger) (window as any).logger.log('LOADER', 'Script failed', { src });
 				reject(new Error(`Failed to load ${src}`));
 			};
 			

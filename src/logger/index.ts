@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * 日志系统入口
  * 组合 LoggerCore + LoggerUI
@@ -50,4 +49,4 @@ class Logger {
 window.logger = new Logger();
 
 // 模块加载检测
-if (window.logger) logger.core.log('module', 'logger.js loaded');
+if (window.logger) window.logger.core.log('module', 'logger.js loaded');
