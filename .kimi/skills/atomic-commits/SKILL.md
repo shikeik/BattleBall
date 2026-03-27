@@ -1,6 +1,6 @@
 ---
 name: atomic-commits
-description: Git Atomic Commits 提交助手。帮助用户按规范完成代码提交，包括：查看更改状态、分类文件、编写规范提交信息（type: description 格式）、决定提交粒度（合并/拆分）。当用户说"提交"、"commit"、"按规范提交"、"atomic commit"时触发。
+description: Git 提交助手。当用户需要提交代码时说"提交"、"commit"、"提交代码"、"提交更改"、"按规范提交"、"atomic commit"等触发。帮助用户按 Atomic Commits 原则完成提交：查看更改状态、分类文件、编写规范提交信息（type: description 格式）、决定提交粒度（合并/拆分）。
 ---
 
 # Atomic Commits 提交助手
