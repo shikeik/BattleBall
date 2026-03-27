@@ -91,7 +91,13 @@ Task({
 
 1. **切回原分支：**
    ```bash
-   git checkout feature/battle-ball-game  # 或其他原分支
+   git checkout -  # 切回上一个分支，或手动指定原分支名
+   ```
+   
+   或者先查看当前分支再切回：
+   ```bash
+   git branch  # 查看分支列表，找到原分支名
+   git checkout <原分支名>
    ```
 
 2. **删除临时分支：**
