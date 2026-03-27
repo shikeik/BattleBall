@@ -23,6 +23,8 @@ declare class BattleBallScreen extends Screen {
     beansInitialized: boolean | undefined;
     joystick: Joystick | null | undefined;
     playerSpeed: number | undefined;
+    eatCooldown: number | undefined;
+    eatCooldownTime: number | undefined;
     /**
      * 初始化世界相机
      * 覆盖父类方法，使用自定义相机
@@ -36,6 +38,10 @@ declare class BattleBallScreen extends Screen {
         height: any;
     } | undefined;
     enter(): void;
+    /**
+     * 初始化相机缩放 - 读取工具条的视野大小设置
+     */
+    _initCameraZoom(): void;
     /**
      * 初始化彩豆
      */
@@ -93,7 +99,7 @@ declare class BattleBallScreen extends Screen {
     /**
      * 检测吃掉的彩豆
      */
-    _checkEatBeans(): void;
+    _checkEatBeans(delta: any): void;
     /**
      * 绑定事件
      */

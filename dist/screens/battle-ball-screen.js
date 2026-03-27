@@ -19,7 +19,7 @@ class BattleBallScreen extends Screen {
         this.player = {
             x: 0,
             y: 0,
-            radius: 20,
+            radius: 10,
             color: '#00ffff'
         };
         // 彩豆管理器
@@ -29,6 +29,9 @@ class BattleBallScreen extends Screen {
         this.joystick = null;
         // 玩家移动速度
         this.playerSpeed = 200; // 像素/秒
+        // 吃豆冷却
+        this.eatCooldown = 0;
+        this.eatCooldownTime = 0.1; // 100ms
         if (window.logger)
             logger.log('BATTLE', 'BattleBallScreen init');
     }
@@ -48,12 +51,26 @@ class BattleBallScreen extends Screen {
     enter() {
         super.enter();
         this._bindEvents();
+        // 读取视野大小设置并应用
+        this._initCameraZoom();
         // 初始化摇杆
         this._initJoystick();
         // 初始化彩豆
         this._initBeans();
         if (window.logger)
             logger.log('BATTLE', 'BattleBallScreen enter');
+    }
+    /**
+     * 初始化相机缩放 - 读取工具条的视野大小设置
+     */
+    _initCameraZoom() {
+        const slider = document.getElementById('camera-zoom-slider');
+        if (slider) {
+            const viewScale = parseFloat(slider.value);
+            this.setCameraZoom(viewScale);
+            if (window.logger)
+                logger.log('BATTLE', `Init camera zoom from slider: ${viewScale}`);
+        }
     }
     /**
      * 初始化彩豆
@@ -140,7 +157,7 @@ class BattleBallScreen extends Screen {
         // 更新玩家位置
         this._updatePlayer(delta);
         // 检测吃掉的彩豆
-        this._checkEatBeans();
+        this._checkEatBeans(delta);
     }
     /**
      * 使用 WebGPU 渲染世界（彩豆）
@@ -345,14 +362,21 @@ class BattleBallScreen extends Screen {
     /**
      * 检测吃掉的彩豆
      */
-    _checkEatBeans() {
+    _checkEatBeans(delta) {
         if (!this.beanManager || !this.beansInitialized)
             return;
+        // 更新冷却时间
+        if (this.eatCooldown > 0) {
+            this.eatCooldown -= delta;
+            return;
+        }
         const eaten = this.beanManager.eatBeans(this.player.x, this.player.y, this.player.radius);
         if (eaten > 0) {
             // 玩家成长
-            const growth = eaten * 0.1;
+            const growth = eaten * 0.5;
             this.player.radius = Math.min(100, this.player.radius + growth);
+            // 设置冷却
+            this.eatCooldown = this.eatCooldownTime;
             if (window.logger) {
                 logger.log('BATTLE', `Ate ${eaten} beans, radius: ${this.player.radius.toFixed(1)}`);
             }
