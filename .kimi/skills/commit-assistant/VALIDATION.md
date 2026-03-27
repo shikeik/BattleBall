@@ -9,10 +9,10 @@
 
 | 触发词 | 预期行为 | 通过 |
 |--------|----------|------|
-| "提交" | 按 atomic-commits 执行提交 | ☐ |
-| "提交代码" | 按 atomic-commits 执行提交 | ☐ |
-| "commit" | 按 atomic-commits 执行提交 | ☐ |
-| "按规范提交" | 按 atomic-commits 执行提交 | ☐ |
+| "提交" | 按 commit-assistant 执行提交 | ☐ |
+| "提交代码" | 按 commit-assistant 执行提交 | ☐ |
+| "commit" | 按 commit-assistant 执行提交 | ☐ |
+| "按规范提交" | 按 commit-assistant 执行提交 | ☐ |
 
 ## 功能验收清单
 

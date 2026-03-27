@@ -1,6 +1,6 @@
 ---
-name: atomic-commits
-description: Git 提交助手。当用户需要提交代码时说"提交"、"commit"、"提交代码"、"提交更改"、"按规范提交"、"atomic commit"等触发。帮助用户按 Atomic Commits 原则完成提交：查看更改状态、分类文件、编写规范提交信息（type: description 格式）、决定提交粒度（合并/拆分）。
+name: commit-assistant
+description: Git 提交助手。当用户说"提交"、"commit"、"提交代码"时触发。按 Atomic Commits 原则完成提交。
 ---
 
 # Atomic Commits 提交助手
@@ -18,7 +18,7 @@ git diff --stat       # 查看更改统计
 **同一功能的文件 → 一个 commit**
 ```bash
 # 示例：技能重命名 + frontmatter 更新（同一功能）
-git add .kimi/skills/atomic-commits/ .kimi/skills/git-history-rewrite/
+git add .kimi/skills/commit-assistant/ .kimi/skills/git-history-rewrite/
 git add .kimi/skills/code-quality-refactoring/ .kimi/skills/view-media/
 git commit -m "refactor: 重命名技能目录并添加规范 frontmatter"
 ```
