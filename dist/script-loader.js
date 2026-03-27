@@ -91,6 +91,7 @@ const SCRIPT_GROUPS = {
         { name: 'Bean Manager', src: 'js/battle-ball/bean-manager.js', weight: 1 },
         { name: 'Joystick', src: 'js/battle-ball/joystick.js', weight: 1 },
         { name: 'BattleBall Screen', src: 'dist/screens/battle-ball-screen.js', weight: 1 },
+        { name: 'Bean Test Screen', src: 'dist/screens/bean-test-screen.js', weight: 1 },
     ],
 };
 // 导出

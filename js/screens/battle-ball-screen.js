@@ -93,12 +93,22 @@ class BattleBallScreen extends Screen {
 					this.beanManager._createInstanceBuffer();
 					
 					const worldCanvas = document.getElementById('worldCanvas');
-					if (!worldCanvas) return;
+					if (!worldCanvas) {
+						if (window.logger) logger.log('BATTLE_ERROR', 'worldCanvas not found');
+						return;
+					}
 					
-					worldCanvas.style.width = this.screenWidth + 'px';
-					worldCanvas.style.height = this.screenHeight + 'px';
-					worldCanvas.width = Math.floor(this.screenWidth * this.dpr);
-					worldCanvas.height = Math.floor(this.screenHeight * this.dpr);
+					// 使用窗口尺寸
+					const width = window.innerWidth;
+					const height = window.innerHeight;
+					const dpr = window.devicePixelRatio || 1;
+					
+					worldCanvas.style.width = width + 'px';
+					worldCanvas.style.height = height + 'px';
+					worldCanvas.width = Math.floor(width * dpr);
+					worldCanvas.height = Math.floor(height * dpr);
+					
+					if (window.logger) logger.log('BATTLE', `worldCanvas set: ${worldCanvas.width}x${worldCanvas.height}`);
 					
 					const resourcesOk = await this.beanManager.initRenderResources(worldCanvas);
 					if (!resourcesOk) return;
