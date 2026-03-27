@@ -1,12 +1,9 @@
-// @ts-nocheck
 /**
  * SelectionScreen - 选择屏基类
  * 原版逻辑：使用 Map 映射，null 值作为分隔线，全部触发 replace
  */
 
-/// <reference path="./screen.ts" />
-
-class SelectionScreen extends Screen {
+class SelectionScreen extends (window as any).Screen {
 	private screenMapping: Map<string, any>;
 	private hoveredIndex: number;
 	private buttons: Array<{ index: number, x: number, y: number, w: number, h: number, screenClass: any }>;
@@ -21,8 +18,8 @@ class SelectionScreen extends Screen {
 	private _onTouchStart: (e: TouchEvent) => void;
 	private _onTouchEnd: (e: TouchEvent) => void;
 
-	constructor(screenManager: any) {
-		super(screenManager);
+	constructor(screenManager?: any) {
+		super();
 		this.screenMapping = new Map();
 		this.hoveredIndex = -1;
 		this.buttons = []; // 只存储实际按钮（排除分隔线）
@@ -149,17 +146,17 @@ class SelectionScreen extends Screen {
 	 */
 	onScreenSelected(screenClass: any): void {
 		if (window.logger) {
-			logger.log('SELECT', 'onScreenSelected called');
-			logger.log('SELECT', 'screenClass: ' + screenClass.name);
-			logger.log('SELECT', 'this: ' + this.constructor.name);
-			logger.log('SELECT', 'this.screenManager type: ' + typeof this.screenManager);
-			logger.log('SELECT', 'this.screenManager constructor: ' + (this.screenManager ? this.screenManager.constructor.name : 'null'));
-			logger.log('SELECT', 'has replaceScreen: ' + (this.screenManager && this.screenManager.replaceScreen ? 'YES' : 'NO'));
+			(window as any).logger.log('SELECT', 'onScreenSelected called');
+			(window as any).logger.log('SELECT', 'screenClass: ' + screenClass.name);
+			(window as any).logger.log('SELECT', 'this: ' + this.constructor.name);
+			(window as any).logger.log('SELECT', 'this.screenManager type: ' + typeof this.screenManager);
+			(window as any).logger.log('SELECT', 'this.screenManager constructor: ' + (this.screenManager ? this.screenManager.constructor.name : 'null'));
+			(window as any).logger.log('SELECT', 'has replaceScreen: ' + (this.screenManager && this.screenManager.replaceScreen ? 'YES' : 'NO'));
 		}
 		if (this.screenManager && this.screenManager.replaceScreen) {
 			this.screenManager.replaceScreen(screenClass);
 		} else {
-			if (window.logger) logger.log('ERROR', 'screenManager.replaceScreen not available');
+			if (window.logger) (window as any).logger.log('ERROR', 'screenManager.replaceScreen not available');
 		}
 	}
 
@@ -202,7 +199,7 @@ class SelectionScreen extends Screen {
 			if (index >= 0) {
 				const btn = this.buttons[index];
 				console.log('Selected:', btn.screenClass.name);
-				if (window.logger) logger.log('SELECT', `Selected: ${btn.screenClass.name}`);
+				if (window.logger) (window as any).logger.log('SELECT', `Selected: ${btn.screenClass.name}`);
 				this.onScreenSelected(btn.screenClass);
 			}
 		};
@@ -222,7 +219,7 @@ class SelectionScreen extends Screen {
 			if (this.hoveredIndex >= 0) {
 				const btn = this.buttons[this.hoveredIndex];
 				console.log('Touch selected:', btn.screenClass.name);
-				if (window.logger) logger.log('SELECT', `Selected: ${btn.screenClass.name}`);
+				if (window.logger) (window as any).logger.log('SELECT', `Selected: ${btn.screenClass.name}`);
 				this.onScreenSelected(btn.screenClass);
 				this.hoveredIndex = -1;
 			}
