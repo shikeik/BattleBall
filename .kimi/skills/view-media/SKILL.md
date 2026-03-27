@@ -1,6 +1,6 @@
 ---
 name: view-media
-description: 查看手机截图、视频和日志文件。自动查找并读取最新的截图（DCIM/Screenshots）、录屏视频（DCIM/ScreenRecorder）和游戏日志（Download/game-log）。当用户说"看截图"、"看最新视频"、"看录屏"、"看日志"、"看log"或需要查看手机上的媒体文件时触发。
+description: 查看手机截图、视频和日志文件。当用户说"看截图"、"看最新截图"、"看最新两张截图"、"看最新视频"、"看录屏"、"看日志"、"看最新日志"、"看最新两个日志"、"看log"、"读取截图"、"读取日志"或需要查看手机上的媒体文件时触发。自动查找并读取最新的截图（DCIM/Screenshots）、录屏视频（DCIM/ScreenRecorder）和游戏日志（Download/game-log）。
 ---
 
 # 查看截图/视频/日志
