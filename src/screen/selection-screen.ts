@@ -3,13 +3,18 @@
  * 原版逻辑：使用 Map 映射，null 值作为分隔线，全部触发 replace
  */
 
-class SelectionScreen extends (window as any).Screen {
+class SelectionScreen extends window.GScreen {
+	// 从基类继承的属性声明
+	protected visible: boolean;
+	protected screenWidth: number;
+	protected screenHeight: number;
+	protected dpr: number;
+	protected getCanvas(): HTMLCanvasElement | null { return null; }
+	
 	private screenMapping: Map<string, any>;
 	private hoveredIndex: number;
 	private buttons: Array<{ index: number, x: number, y: number, w: number, h: number, screenClass: any }>;
-	protected visible: boolean;
 	protected uiViewport: any;
-	protected dpr: number;
 	protected screenManager: any;
 
 	// 方法绑定
@@ -146,17 +151,17 @@ class SelectionScreen extends (window as any).Screen {
 	 */
 	onScreenSelected(screenClass: any): void {
 		if (window.logger) {
-			(window as any).logger.log('SELECT', 'onScreenSelected called');
-			(window as any).logger.log('SELECT', 'screenClass: ' + screenClass.name);
-			(window as any).logger.log('SELECT', 'this: ' + this.constructor.name);
-			(window as any).logger.log('SELECT', 'this.screenManager type: ' + typeof this.screenManager);
-			(window as any).logger.log('SELECT', 'this.screenManager constructor: ' + (this.screenManager ? this.screenManager.constructor.name : 'null'));
-			(window as any).logger.log('SELECT', 'has replaceScreen: ' + (this.screenManager && this.screenManager.replaceScreen ? 'YES' : 'NO'));
+			window.logger.log('SELECT', 'onScreenSelected called');
+			window.logger.log('SELECT', 'screenClass: ' + screenClass.name);
+			window.logger.log('SELECT', 'this: ' + this.constructor.name);
+			window.logger.log('SELECT', 'this.screenManager type: ' + typeof this.screenManager);
+			window.logger.log('SELECT', 'this.screenManager constructor: ' + (this.screenManager ? this.screenManager.constructor.name : 'null'));
+			window.logger.log('SELECT', 'has replaceScreen: ' + (this.screenManager && this.screenManager.replaceScreen ? 'YES' : 'NO'));
 		}
 		if (this.screenManager && this.screenManager.replaceScreen) {
 			this.screenManager.replaceScreen(screenClass);
 		} else {
-			if (window.logger) (window as any).logger.log('ERROR', 'screenManager.replaceScreen not available');
+			if (window.logger) window.logger.log('ERROR', 'screenManager.replaceScreen not available');
 		}
 	}
 
@@ -199,7 +204,7 @@ class SelectionScreen extends (window as any).Screen {
 			if (index >= 0) {
 				const btn = this.buttons[index];
 				console.log('Selected:', btn.screenClass.name);
-				if (window.logger) (window as any).logger.log('SELECT', `Selected: ${btn.screenClass.name}`);
+				if (window.logger) window.logger.log('SELECT', `Selected: ${btn.screenClass.name}`);
 				this.onScreenSelected(btn.screenClass);
 			}
 		};
@@ -219,7 +224,7 @@ class SelectionScreen extends (window as any).Screen {
 			if (this.hoveredIndex >= 0) {
 				const btn = this.buttons[this.hoveredIndex];
 				console.log('Touch selected:', btn.screenClass.name);
-				if (window.logger) (window as any).logger.log('SELECT', `Selected: ${btn.screenClass.name}`);
+				if (window.logger) window.logger.log('SELECT', `Selected: ${btn.screenClass.name}`);
 				this.onScreenSelected(btn.screenClass);
 				this.hoveredIndex = -1;
 			}

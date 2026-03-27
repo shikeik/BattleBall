@@ -42,7 +42,7 @@ class GScreen {
 		this._updateCanvasSize();
 		this.init();
 		this.initialized = true;
-		if ((window as any).logger) (window as any).logger.log('SCREEN', `${this.constructor.name} initialized`);
+		if (window.logger) window.logger.log('SCREEN', `${this.constructor.name} initialized`);
 	}
 	
 	/**
@@ -101,8 +101,8 @@ class GScreen {
 		canvas.width = Math.floor(this.screenWidth * this.dpr);
 		canvas.height = Math.floor(this.screenHeight * this.dpr);
 		
-		if ((window as any).logger) {
-			(window as any).logger.log('SCREEN', `Canvas resized: ${canvas.width}x${canvas.height} (DPR: ${this.dpr})`);
+		if (window.logger) {
+			window.logger.log('SCREEN', `Canvas resized: ${canvas.width}x${canvas.height} (DPR: ${this.dpr})`);
 		}
 	}
 
@@ -135,8 +135,8 @@ class GScreen {
 			// 方向改变，更新 Viewport 的 world 尺寸
 			this.uiViewport.updateOrientation(isLandscape);
 			
-			if ((window as any).logger) {
-				(window as any).logger.log('SCREEN', `Viewport orientation updated: ${isLandscape ? 'landscape' : 'portrait'}`);
+			if (window.logger) {
+				window.logger.log('SCREEN', `Viewport orientation updated: ${isLandscape ? 'landscape' : 'portrait'}`);
 			}
 		}
 	}
@@ -169,7 +169,7 @@ class GScreen {
 		window.addEventListener('resize', this._resizeHandler);
 		window.addEventListener('orientationchange', this._resizeHandler);
 		
-		if ((window as any).logger) (window as any).logger.log('SCREEN', `${this.constructor.name} enter`);
+		if (window.logger) window.logger.log('SCREEN', `${this.constructor.name} enter`);
 	}
 	
 	exit(): void {
@@ -182,7 +182,7 @@ class GScreen {
 			this._resizeHandler = null;
 		}
 		
-		if ((window as any).logger) (window as any).logger.log('SCREEN', `${this.constructor.name} exit`);
+		if (window.logger) window.logger.log('SCREEN', `${this.constructor.name} exit`);
 	}
 	
 	render(delta: number): void {}
@@ -224,8 +224,8 @@ class GScreen {
 			this.onResize();
 			
 			const isLandscape = this.screenWidth > this.screenHeight;
-			if ((window as any).logger) {
-				(window as any).logger.log('SCREEN', `Resized to ${this.screenWidth}x${this.screenHeight} (${isLandscape ? 'landscape' : 'portrait'})`);
+			if (window.logger) {
+				window.logger.log('SCREEN', `Resized to ${this.screenWidth}x${this.screenHeight} (${isLandscape ? 'landscape' : 'portrait'})`);
 			}
 		}, 100);
 	}
@@ -260,10 +260,10 @@ class GScreen {
 	
 	destroy(): void {
 		this.initialized = false;
-		if ((window as any).logger) (window as any).logger.log('SCREEN', `${this.constructor.name} destroyed`);
+		if (window.logger) window.logger.log('SCREEN', `${this.constructor.name} destroyed`);
 	}
 }
 
 if (typeof window !== 'undefined') {
-	(window as any).Screen = GScreen;
+	window.Screen = GScreen;
 }

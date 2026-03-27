@@ -7,16 +7,16 @@ class ScriptLoader {
 	private cacheBuster: number;
 
 	constructor() {
-		this.cacheBuster = (window as any).CACHE_BUSTER || Date.now();
+		this.cacheBuster = window.CACHE_BUSTER || Date.now();
 	}
 	
 	/**
 	 * 加载单个脚本
-	 * @param {string} src - 脚本路径
-	 * @param {boolean} useCache - 是否使用缓存（CDN文件用缓存）
-	 * @returns {Promise}
+	 * @param src - 脚本路径
+	 * @param useCache - 是否使用缓存（CDN文件用缓存）
+	 * @returns Promise
 	 */
-	loadOne(src, useCache = false) {
+	loadOne(src: string, useCache = false): Promise<string> {
 		return new Promise((resolve, reject) => {
 			const script = document.createElement('script');
 			// CDN文件(http开头)使用缓存，本地文件加缓存戳
@@ -29,13 +29,17 @@ class ScriptLoader {
 			}
 			
 			script.onload = () => {
-				if ((window as any).logger) (window as any).logger.log('LOADER', 'Script loaded', { src });
+				if (window.logger) {
+					window.logger.log('LOADER', 'Script loaded', { src });
+				}
 				resolve(src);
 			};
 			
 			script.onerror = () => {
 				console.error('Failed to load:', src);
-				if ((window as any).logger) (window as any).logger.log('LOADER', 'Script failed', { src });
+				if (window.logger) {
+					window.logger.log('LOADER', 'Script failed', { src });
+				}
 				reject(new Error(`Failed to load ${src}`));
 			};
 			
@@ -45,11 +49,14 @@ class ScriptLoader {
 	
 	/**
 	 * 批量加载脚本，带进度回调
-	 * @param {Array} scripts - 脚本配置数组 [{name, src, weight, useCache}]
-	 * @param {Function} onProgress - 进度回调 (percent, status)
-	 * @returns {Promise}
+	 * @param scripts - 脚本配置数组 [{name, src, weight, useCache}]
+	 * @param onProgress - 进度回调 (percent, status)
+	 * @returns Promise
 	 */
-	async loadBatch(scripts, onProgress) {
+	async loadBatch(
+		scripts: Array<{ name: string; src: string; weight?: number; useCache?: boolean }>,
+		onProgress: (percent: number, status: string) => void
+	): Promise<void> {
 		const totalWeight = scripts.reduce((sum, s) => sum + (s.weight || 1), 0);
 		let completedWeight = 0;
 		
@@ -88,12 +95,7 @@ const SCRIPT_GROUPS = {
 		{ name: 'Toolbar', src: 'dist/toolbar.js', weight: 1 },
 	],
 	
-	// WebGPU 演示
-	webgpuDemo: [
-		{ name: 'WebGPU Demo', src: 'dist/webgpu-demo/webgpu-demo.js', weight: 1 },
-	],
-	
-	// 屏幕管理系统（从 dist 加载编译后的 JS）
+	// 屏幕管理系统
 	screen: [
 		{ name: 'Viewport', src: 'dist/screen/viewport.js', weight: 1 },
 		{ name: 'Screen Base', src: 'dist/screen/screen.js', weight: 1 },
@@ -101,15 +103,9 @@ const SCRIPT_GROUPS = {
 		{ name: 'Selection Screen', src: 'dist/screen/selection-screen.js', weight: 1 },
 	],
 	
-	// 游戏屏幕（从 dist 加载编译后的 JS）
+	// 游戏屏幕
 	screens: [
-		{ name: 'WebGPU Screen', src: 'dist/screens/webgpu-screen.js', weight: 1 },
-		{ name: 'Settings Screen', src: 'dist/screens/settings-screen.js', weight: 1 },
 		{ name: 'Menu Screen', src: 'dist/screens/menu-screen.js', weight: 1 },
-		{ name: 'Bean Manager', src: 'dist/battle-ball/bean-manager.js', weight: 1 },
-		{ name: 'Joystick', src: 'dist/battle-ball/joystick.js', weight: 1 },
-		{ name: 'BattleBall Screen', src: 'dist/screens/battle-ball-screen.js', weight: 1 },
-		{ name: 'Bean Test Screen', src: 'dist/screens/bean-test-screen.js', weight: 1 },
 	],
 };
 

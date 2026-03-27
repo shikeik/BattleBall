@@ -145,4 +145,4 @@ document.addEventListener('DOMContentLoaded', () => {
 	UILayers.initCSSVariables();
 });
 
-if ((window as any).logger) (window as any).logger.log('module', 'ui-layers loaded');
+if (window.logger) window.logger.log('module', 'ui-layers loaded');

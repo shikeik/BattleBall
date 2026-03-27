@@ -21,13 +21,13 @@ class ScreenManager {
 
 	register(screenClass: any, instance?: any): this {
 		if (this.screens.has(screenClass)) {
-			if ((window as any).logger) (window as any).logger.log('SCREEN_MGR', `${screenClass.name} already registered`);
+			if (window.logger) window.logger.log('SCREEN_MGR', `${screenClass.name} already registered`);
 			return this;
 		}
 		if (!instance) instance = new screenClass(this);
 		instance.screenManager = this;
 		this.screens.set(screenClass, instance);
-		if ((window as any).logger) (window as any).logger.log('SCREEN_MGR', `Registered ${screenClass.name}`);
+		if (window.logger) window.logger.log('SCREEN_MGR', `Registered ${screenClass.name}`);
 		return this;
 	}
 
@@ -51,7 +51,7 @@ class ScreenManager {
 		}
 		this.currentScreen = screen;
 		this.currentScreen.enter();
-		if ((window as any).logger) (window as any).logger.log('SCREEN_MGR', `Go screen: ${screen.constructor.name}, stack: [${this.getStackInfo()}]`);
+		if (window.logger) window.logger.log('SCREEN_MGR', `Go screen: ${screen.constructor.name}, stack: [${this.getStackInfo()}]`);
 		return this;
 	}
 
@@ -62,12 +62,12 @@ class ScreenManager {
 		if (this.currentScreen) this.currentScreen.exit();
 		this.currentScreen = next;
 		this.currentScreen.enter();
-		if ((window as any).logger) (window as any).logger.log('SCREEN_MGR', `Show screen: ${next.constructor.name}`);
+		if (window.logger) window.logger.log('SCREEN_MGR', `Show screen: ${next.constructor.name}`);
 		return this;
 	}
 
 	replaceScreen(screenClass: any): this {
-		if ((window as any).logger) (window as any).logger.log('SCREEN_MGR', `Replace screen: ${screenClass.name}`);
+		if (window.logger) window.logger.log('SCREEN_MGR', `Replace screen: ${screenClass.name}`);
 		if (this.screens.has(screenClass)) {
 			this.screens.get(screenClass).destroy();
 			this.screens.delete(screenClass);
@@ -77,14 +77,14 @@ class ScreenManager {
 
 	popScreen(): boolean {
 		if (this.screenStack.length === 0) {
-			if ((window as any).logger) (window as any).logger.log('SCREEN_MGR', 'Pop failed: stack empty');
+			if (window.logger) window.logger.log('SCREEN_MGR', 'Pop failed: stack empty');
 			return false;
 		}
 		const prev = this.screenStack.pop();
 		this.popping = true;
 		this._goScreenInstance(prev);
 		this.popping = false;
-		if ((window as any).logger) (window as any).logger.log('SCREEN_MGR', `Pop to: ${prev.constructor.name}, stack: [${this.getStackInfo()}]`);
+		if (window.logger) window.logger.log('SCREEN_MGR', `Pop to: ${prev.constructor.name}, stack: [${this.getStackInfo()}]`);
 		return true;
 	}
 
@@ -123,7 +123,7 @@ class ScreenManager {
 		if (!this.screens.has(screenClass)) {
 			const instance = new screenClass(this);
 			this.screens.set(screenClass, instance);
-			if ((window as any).logger) (window as any).logger.log('SCREEN_MGR', `Created ${screenClass.name}`);
+			if (window.logger) window.logger.log('SCREEN_MGR', `Created ${screenClass.name}`);
 		}
 		return this.screens.get(screenClass);
 	}
@@ -134,5 +134,5 @@ class ScreenManager {
 }
 
 if (typeof window !== 'undefined') {
-	(window as any).ScreenManager = ScreenManager;
+	window.ScreenManager = ScreenManager;
 }
