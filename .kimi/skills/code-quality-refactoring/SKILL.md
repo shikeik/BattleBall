@@ -1,3 +1,8 @@
+---
+name: code-quality-refactoring
+description: 代码质量检查与重构指南。提供 DRY、SRP、OCP 等设计原则指导，帮助识别代码异味（重复代码、魔法数字、过长函数等），给出重构手法和最佳实践。当用户说"重构"、"代码质量"、"优化代码"、"DRY"、"消除重复"或需要改进代码结构时触发。
+---
+
 # 代码质量与重构 (Code Quality & Refactoring)
 
 ## 核心原则：DRY (Don't Repeat Yourself)

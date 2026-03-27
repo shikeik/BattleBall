@@ -1,8 +1,17 @@
-# Git 提交信息中文化 Skill
+---
+name: git-history-rewrite
+description: Git 历史提交信息修正工具。用于修改已存在的提交信息，包括：中英文转换、修正错误描述、重写历史提交、amend 最近一次提交。当用户说"修正提交信息"、"修改历史提交"、"提交信息改中文"、"amend commit"或需要修改已有提交时触发。
+---
+
+# Git 历史提交信息修正
 
 ## 适用场景
 
-当用户需要将 Git 提交信息（标题和内容）从英文修改为中文时使用。
+当用户需要修改已存在的提交信息时使用：
+- 中英文转换（如将英文提交信息改为中文）
+- 修正错误描述
+- 重写历史提交
+- 合并或拆分提交
 
 ## 禁用方法
 
@@ -126,8 +135,3 @@ git filter-branch --msg-filter '
 git checkout <commit>
 git commit --amend -m "新信息"  # ✅ 正确
 ```
-
-## 参考
-
-- 本 skill 来自实践经验：2026-03-27 修改 battle-ball 项目 4 条提交信息
-- 原方案尝试使用 filter-branch 失败，最终使用 cherry-pick 方案成功
