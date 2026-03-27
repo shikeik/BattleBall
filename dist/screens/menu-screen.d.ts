@@ -3,6 +3,7 @@
  * 原版用法：填充 screenMapping，null 作为分隔线
  */
 declare class MenuScreen extends SelectionScreen {
+    initScreenMapping(map: any): void;
 }
 declare class GameScreen extends Screen {
     init(): void;

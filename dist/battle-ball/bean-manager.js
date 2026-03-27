@@ -283,4 +283,6 @@ class BeanManager {
     }
 }
 window.BeanManager = BeanManager;
+// test3
+// test4
 //# sourceMappingURL=bean-manager.js.map

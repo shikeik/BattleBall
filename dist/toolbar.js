@@ -40,9 +40,11 @@ class Toolbar {
 			left: 0;
 			width: 100%;
 			height: 40px;
+			min-height: 40px;
 			z-index: ${UILayers.TOOLBAR};
 			overflow: hidden;
 			pointer-events: auto;
+			-webkit-text-size-adjust: none;
 		`;
         // 按钮轨道（用于滑动）
         this.track = document.createElement('div');
@@ -237,11 +239,13 @@ class Toolbar {
 			align-items: center;
 			justify-content: center;
 			cursor: pointer;
-			font-size: 14px;
+			font-size: 16px;
+			line-height: 1;
 			color: ${button.id.startsWith('empty-') ? 'rgba(0,255,255,0.25)' : '#0ff'};
 			backdrop-filter: blur(4px);
 			transition: all 0.2s ease;
 			user-select: none;
+			-webkit-text-size-adjust: none;
 		`;
         // 悬停效果
         el.onmouseenter = () => {

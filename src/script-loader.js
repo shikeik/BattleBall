@@ -69,26 +69,26 @@ class ScriptLoader {
 const SCRIPT_GROUPS = {
 	// UI层级系统
 	ui: [
-		{ name: 'UI Layers', src: 'js/ui/layers.js', weight: 1 },
+		{ name: 'UI Layers', src: 'src/ui/layers.js', weight: 1 },
 	],
 	
 	// 日志系统
 	logger: [
-		{ name: 'Logger Config', src: 'js/logger/config.js', weight: 1 },
-		{ name: 'Logger Core', src: 'js/logger/core.js', weight: 1 },
-		{ name: 'Logger UI', src: 'js/logger/ui.js', weight: 1 },
-		{ name: 'Logger Index', src: 'js/logger/index.js', weight: 1 },
+		{ name: 'Logger Config', src: 'src/logger/config.js', weight: 1 },
+		{ name: 'Logger Core', src: 'src/logger/core.js', weight: 1 },
+		{ name: 'Logger UI', src: 'src/logger/ui.js', weight: 1 },
+		{ name: 'Logger Index', src: 'src/logger/index.js', weight: 1 },
 	],
 	
 	// 工具栏
 	toolbar: [
-		{ name: 'Perf Monitor', src: 'js/perf-monitor.js', weight: 1 },
-		{ name: 'Toolbar', src: 'js/toolbar.js', weight: 1 },
+		{ name: 'Perf Monitor', src: 'src/perf-monitor.js', weight: 1 },
+		{ name: 'Toolbar', src: 'src/toolbar.js', weight: 1 },
 	],
 	
 	// WebGPU 演示
 	webgpuDemo: [
-		{ name: 'WebGPU Demo', src: 'js/webgpu-demo/webgpu-demo.js', weight: 1 },
+		{ name: 'WebGPU Demo', src: 'src/webgpu-demo/webgpu-demo.js', weight: 1 },
 	],
 	
 	// 屏幕管理系统（从 dist 加载编译后的 JS）
@@ -104,8 +104,8 @@ const SCRIPT_GROUPS = {
 		{ name: 'WebGPU Screen', src: 'dist/screens/webgpu-screen.js', weight: 1 },
 		{ name: 'Settings Screen', src: 'dist/screens/settings-screen.js', weight: 1 },
 		{ name: 'Menu Screen', src: 'dist/screens/menu-screen.js', weight: 1 },
-		{ name: 'Bean Manager', src: 'js/battle-ball/bean-manager.js', weight: 1 },
-		{ name: 'Joystick', src: 'js/battle-ball/joystick.js', weight: 1 },
+		{ name: 'Bean Manager', src: 'src/battle-ball/bean-manager.js', weight: 1 },
+		{ name: 'Joystick', src: 'src/battle-ball/joystick.js', weight: 1 },
 		{ name: 'BattleBall Screen', src: 'dist/screens/battle-ball-screen.js', weight: 1 },
 		{ name: 'Bean Test Screen', src: 'dist/screens/bean-test-screen.js', weight: 1 },
 	],

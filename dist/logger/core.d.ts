@@ -2,188 +2,8 @@
  * 日志核心 - 纯数据逻辑，无 DOM 操作
  */
 declare class LoggerCore {
-    constructor(config?: {
-        maxLogs: number;
-        panel: {
-            maxHeight: number;
-            filterHeight: number;
-        };
-        tags: {
-            ALL: {
-                label: string;
-                subs: string[];
-                color: string;
-            };
-            ERROR: {
-                label: string;
-                subs: string[];
-                color: string;
-            };
-            TMP: {
-                label: string;
-                subs: string[];
-                color: string;
-            };
-            game: {
-                label: string;
-                subs: string[];
-                color: string;
-            };
-            render: {
-                label: string;
-                subs: string[];
-                color: string;
-            };
-            input: {
-                label: string;
-                subs: string[];
-                color: string;
-            };
-            audio: {
-                label: string;
-                subs: string[];
-                color: string;
-            };
-            perf: {
-                label: string;
-                subs: string[];
-                color: string;
-            };
-            module: {
-                label: string;
-                subs: string[];
-                color: string;
-            };
-            AUDIO: {
-                label: string;
-                subs: string[];
-                color: string;
-            };
-            DIFFICULTY: {
-                label: string;
-                subs: string[];
-                color: string;
-            };
-            GAME: {
-                label: string;
-                subs: string[];
-                color: string;
-            };
-            INPUT: {
-                label: string;
-                subs: string[];
-                color: string;
-            };
-            PERF: {
-                label: string;
-                subs: string[];
-                color: string;
-            };
-            UI: {
-                label: string;
-                subs: string[];
-                color: string;
-            };
-            system: {
-                label: string;
-                subs: string[];
-                color: string;
-            };
-        };
-        storageKey: string;
-        assignColor: typeof assignColor;
-    });
-    config: {
-        maxLogs: number;
-        panel: {
-            maxHeight: number;
-            filterHeight: number;
-        };
-        tags: {
-            ALL: {
-                label: string;
-                subs: string[];
-                color: string;
-            };
-            ERROR: {
-                label: string;
-                subs: string[];
-                color: string;
-            };
-            TMP: {
-                label: string;
-                subs: string[];
-                color: string;
-            };
-            game: {
-                label: string;
-                subs: string[];
-                color: string;
-            };
-            render: {
-                label: string;
-                subs: string[];
-                color: string;
-            };
-            input: {
-                label: string;
-                subs: string[];
-                color: string;
-            };
-            audio: {
-                label: string;
-                subs: string[];
-                color: string;
-            };
-            perf: {
-                label: string;
-                subs: string[];
-                color: string;
-            };
-            module: {
-                label: string;
-                subs: string[];
-                color: string;
-            };
-            AUDIO: {
-                label: string;
-                subs: string[];
-                color: string;
-            };
-            DIFFICULTY: {
-                label: string;
-                subs: string[];
-                color: string;
-            };
-            GAME: {
-                label: string;
-                subs: string[];
-                color: string;
-            };
-            INPUT: {
-                label: string;
-                subs: string[];
-                color: string;
-            };
-            PERF: {
-                label: string;
-                subs: string[];
-                color: string;
-            };
-            UI: {
-                label: string;
-                subs: string[];
-                color: string;
-            };
-            system: {
-                label: string;
-                subs: string[];
-                color: string;
-            };
-        };
-        storageKey: string;
-        assignColor: typeof assignColor;
-    };
+    constructor(config?: typeof LOGGER_CONFIG);
+    config: typeof LOGGER_CONFIG;
     logs: any[];
     activeTags: string[];
     listeners: any[];
@@ -205,85 +25,21 @@ declare class LoggerCore {
     notify(event: any, data: any): void;
     getTagConfig(tag: any): any;
     getAllTags(): {
-        ALL: {
-            label: string;
-            subs: string[];
-            color: string;
-        };
-        ERROR: {
-            label: string;
-            subs: string[];
-            color: string;
-        };
-        TMP: {
-            label: string;
-            subs: string[];
-            color: string;
-        };
-        game: {
-            label: string;
-            subs: string[];
-            color: string;
-        };
-        render: {
-            label: string;
-            subs: string[];
-            color: string;
-        };
-        input: {
-            label: string;
-            subs: string[];
-            color: string;
-        };
-        audio: {
-            label: string;
-            subs: string[];
-            color: string;
-        };
-        perf: {
-            label: string;
-            subs: string[];
-            color: string;
-        };
-        module: {
-            label: string;
-            subs: string[];
-            color: string;
-        };
-        AUDIO: {
-            label: string;
-            subs: string[];
-            color: string;
-        };
-        DIFFICULTY: {
-            label: string;
-            subs: string[];
-            color: string;
-        };
-        GAME: {
-            label: string;
-            subs: string[];
-            color: string;
-        };
-        INPUT: {
-            label: string;
-            subs: string[];
-            color: string;
-        };
-        PERF: {
-            label: string;
-            subs: string[];
-            color: string;
-        };
-        UI: {
-            label: string;
-            subs: string[];
-            color: string;
-        };
-        system: {
-            label: string;
-            subs: string[];
-            color: string;
-        };
+        ALL: typeof DEFAULT_LOG_TAGS.ALL;
+        ERROR: typeof DEFAULT_LOG_TAGS.ERROR;
+        TMP: typeof DEFAULT_LOG_TAGS.TMP;
+        game: typeof DEFAULT_LOG_TAGS.game;
+        render: typeof DEFAULT_LOG_TAGS.render;
+        input: typeof DEFAULT_LOG_TAGS.input;
+        audio: typeof DEFAULT_LOG_TAGS.audio;
+        perf: typeof DEFAULT_LOG_TAGS.perf;
+        module: typeof DEFAULT_LOG_TAGS.module;
+        AUDIO: typeof DEFAULT_LOG_TAGS.AUDIO;
+        DIFFICULTY: typeof DEFAULT_LOG_TAGS.DIFFICULTY;
+        GAME: typeof DEFAULT_LOG_TAGS.GAME;
+        INPUT: typeof DEFAULT_LOG_TAGS.INPUT;
+        PERF: typeof DEFAULT_LOG_TAGS.PERF;
+        UI: typeof DEFAULT_LOG_TAGS.UI;
+        system: typeof DEFAULT_LOG_TAGS.system;
     };
 }

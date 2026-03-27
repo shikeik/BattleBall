@@ -1,4 +1,9 @@
 /* ===== 基础重置 ===== */
+html {
+	font-size: 16px;
+	-webkit-text-size-adjust: 100%;
+}
+
 * {
 	margin: 0;
 	padding: 0;

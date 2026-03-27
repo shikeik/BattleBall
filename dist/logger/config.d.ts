@@ -1,4 +1,5 @@
 declare function assignColor(tagName: any, index: any): any;
+declare function assignColor(tagName: any, index: any): any;
 declare namespace DEFAULT_LOG_TAGS {
     namespace ALL {
         let label: string;
@@ -133,7 +134,7 @@ declare namespace LOGGER_CONFIG {
         let maxHeight: number;
         let filterHeight: number;
     }
-    export { DEFAULT_LOG_TAGS as tags };
+    export let tags: typeof DEFAULT_LOG_TAGS;
     export let storageKey: string;
     export { assignColor };
 }
