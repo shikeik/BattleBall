@@ -19,6 +19,10 @@ declare class BattleBallScreen extends Screen {
         radius: number;
         color: string;
     } | undefined;
+    beanManager: BeanManager | null | undefined;
+    beansInitialized: boolean | undefined;
+    joystick: Joystick | null | undefined;
+    playerSpeed: number | undefined;
     /**
      * 初始化世界相机
      * 覆盖父类方法，使用自定义相机
@@ -32,8 +36,20 @@ declare class BattleBallScreen extends Screen {
         height: any;
     } | undefined;
     enter(): void;
+    /**
+     * 初始化彩豆
+     */
+    _initBeans(): Promise<void>;
     exit(): void;
     render(delta: any): void;
+    /**
+     * 使用 WebGPU 渲染世界（彩豆）
+     */
+    _renderWorld(): void;
+    /**
+     * 使用 2D Canvas 渲染游戏 UI（网格、边界、玩家、摇杆）
+     */
+    _renderGameUI(ctx: any): void;
     /**
      * 绘制网格（只绘制视口内的部分）
      */
@@ -46,6 +62,10 @@ declare class BattleBallScreen extends Screen {
      * 绘制玩家
      */
     _renderPlayer(ctx: any): void;
+    /**
+     * 绘制彩豆
+     */
+    _renderBeans(): void;
     /**
      * 绘制 UI（使用 UI Viewport 坐标系）
      */
@@ -62,6 +82,18 @@ declare class BattleBallScreen extends Screen {
      * 基类已经处理了 Viewport 和 canvas 尺寸更新
      * 这里只需要处理世界相机的特殊逻辑
      */ onResize(): void;
+    /**
+     * 初始化摇杆
+     */
+    _initJoystick(): void;
+    /**
+     * 更新玩家位置
+     */
+    _updatePlayer(delta: any): void;
+    /**
+     * 检测吃掉的彩豆
+     */
+    _checkEatBeans(): void;
     /**
      * 绑定事件
      */
