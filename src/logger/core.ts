@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * 日志核心 - 纯数据逻辑，无 DOM 操作
  */
@@ -84,7 +83,7 @@ class LoggerCore {
 	// 清空日志
 	clear() {
 		this.logs = [];
-		this.notify('cleared');
+		this.notify("cleared", null);
 	}
 	
 	// 获取所有日志（用于保存）

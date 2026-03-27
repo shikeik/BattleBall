@@ -1,10 +1,10 @@
-// @ts-nocheck
 // 全局类型声明
 
 // ==================== WebGPU 类型声明 ====================
 
 interface GPU {
 	requestAdapter(options?: GPURequestAdapterOptions): Promise<GPUAdapter | null>;
+	getPreferredCanvasFormat(): GPUTextureFormat;
 }
 
 interface GPURequestAdapterOptions {
@@ -27,15 +27,33 @@ interface GPUDevice extends EventTarget {
 	createBuffer(descriptor: GPUBufferDescriptor): GPUBuffer;
 	createShaderModule(descriptor: GPUShaderModuleDescriptor): GPUShaderModule;
 	createRenderPipeline(descriptor: GPURenderPipelineDescriptor): GPURenderPipeline;
+	createRenderPipelineAsync(descriptor: GPURenderPipelineDescriptor): Promise<GPURenderPipeline>;
+	createComputePipeline(descriptor: any): any;
+	createComputePipelineAsync(descriptor: any): Promise<any>;
 	createBindGroup(descriptor: GPUBindGroupDescriptor): GPUBindGroup;
 	createBindGroupLayout(descriptor: GPUBindGroupLayoutDescriptor): GPUBindGroupLayout;
 	createPipelineLayout(descriptor: GPUPipelineLayoutDescriptor): GPUPipelineLayout;
 	createCommandEncoder(): GPUCommandEncoder;
 	createTexture(descriptor: GPUTextureDescriptor): GPUTexture;
 	createSampler(descriptor?: GPUSamplerDescriptor): GPUSampler;
+	createQuerySet(descriptor: any): any;
+	createRenderBundleEncoder(descriptor: any): any;
 	queue: GPUQueue;
 	lost: Promise<GPUDeviceLostInfo>;
 	destroy(): void;
+	adapterInfo: any;
+	features: GPUFeatureList;
+	limits: GPULimits;
+	onuncapturederror: ((this: GPUDevice, ev: GPUUncapturedErrorEvent) => any) | null;
+	label?: string;
+}
+
+interface GPUUncapturedErrorEvent extends Event {
+	error: GPUError;
+}
+
+interface GPUError {
+	message: string;
 }
 
 interface GPUDeviceLostInfo {
@@ -55,7 +73,7 @@ interface GPUBuffer {
 	destroy(): void;
 }
 
-declare const GPUBufferUsage: {
+interface GPUBufferUsageStatic {
 	readonly MAP_READ: number;
 	readonly MAP_WRITE: number;
 	readonly COPY_SRC: number;
@@ -66,7 +84,7 @@ declare const GPUBufferUsage: {
 	readonly STORAGE: number;
 	readonly INDIRECT: number;
 	readonly QUERY_RESOLVE: number;
-};
+}
 
 interface GPUShaderModuleDescriptor {
 	code: string;
@@ -230,6 +248,8 @@ interface GPUCanvasContext {
 	configure(configuration: GPUCanvasConfiguration): void;
 	getCurrentTexture(): GPUTexture;
 	unconfigure(): void;
+	canvas: HTMLCanvasElement;
+	getConfiguration(): GPUCanvasConfiguration | null;
 }
 
 interface GPUCanvasConfiguration {
@@ -404,6 +424,83 @@ interface GPULimits {
 	maxVertexBufferArrayStride?: number;
 }
 
+// ==================== Screen 类型 ====================
+
+declare class Screen {
+	screenManager: ScreenManager;
+	initialized: boolean;
+	visible: boolean;
+	uiViewport: any;
+	worldCamera: any;
+	screenWidth: number;
+	screenHeight: number;
+	dpr: number;
+	protected _canvas: HTMLCanvasElement | null;
+	constructor(screenManager?: ScreenManager);
+	initialize(): void;
+	getSafeArea(): { x: number; y: number; width: number; height: number };
+	_updateScreenSize(): void;
+	getCanvas(): HTMLCanvasElement | null;
+	protected _updateCanvasSize(): void;
+	_initUIViewport(): void;
+	_updateViewportOrientation(): void;
+	_initWorldCamera(): void;
+	init(): void;
+	enter(): void;
+	exit(): void;
+	render(delta: number): void;
+	onResize(): void;
+	resize(): void;
+	handleBack(): boolean;
+	destroy(): void;
+}
+
+// ==================== ScreenManager 类型 ====================
+
+declare class ScreenManager {
+	screens: Map<any, any>;
+	screenStack: any[];
+	currentScreen: any;
+	launchScreen: any;
+	popping: boolean;
+	transitionState: any;
+	transitionTime: number;
+	transitionDuration: number;
+	onTransitionMiddle: any;
+	onTransitionEnd: any;
+	overlayFadeDuration: number;
+	loadingTaskFinished: boolean;
+	loadingMinDuration: number;
+	loadingElapsedTime: number;
+	constructor();
+	register(screenClass: any, instance?: any): this;
+	setLaunchScreen(screenClass: any): this;
+	goScreen(screenClass: any): this;
+	_goScreenInstance(screen: any): this;
+	showScreen(screenClass: any): this;
+	replaceScreen(screenClass: any): this;
+	popScreen(): boolean;
+	popTo(targetClass: any): boolean;
+	clearStack(): void;
+	getCurrentScreen(): any;
+	getStackInfo(): string;
+	handleBack(): boolean;
+	isTransitioning(): boolean;
+	render(delta: number): void;
+	_getOrCreate(screenClass: any): any;
+	_initializeScreen(screen: any): void;
+}
+
+// ==================== WebGPUDemo 类型 ====================
+
+declare class WebGPUDemo {
+	constructor(canvas: HTMLCanvasElement);
+	init(): Promise<boolean>;
+	start(): void;
+	stop(): void;
+	destroy(): void;
+}
+
 // ==================== 全局声明 ====================
 
 declare global {
@@ -421,11 +518,15 @@ declare global {
 		BeanManager: typeof import('./battle-ball/bean-manager');
 		Joystick: typeof import('./battle-ball/joystick');
 		LoggerCore: typeof import('./logger/core');
+		Screen: typeof Screen;
+		ScreenManager: typeof ScreenManager;
+		WebGPUDemo: typeof WebGPUDemo;
+		WebGPUScreen: typeof WebGPUScreen;
 		
 		// 全局实例
 		logger?: Logger;
 		toolbar?: InstanceType<typeof import('./toolbar')>;
-		screenManager?: any;
+		screenManager?: ScreenManager;
 		game?: any;
 		tempPerfMonitor?: any;
 		screen?: any;

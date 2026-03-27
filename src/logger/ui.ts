@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
  * 日志 UI - 纯 DOM 操作，依赖 LoggerCore
  */
@@ -142,7 +141,7 @@ class LoggerUI {
 			
 			div.innerHTML = `
 				<input type="checkbox" data-tag="${key}" ${checked} style="${checkStyle}">
-				<span style="color:${cfg.color || '#0f0'}; font-weight:bold; font-size:11px;">${key}</span>
+				<span style="color:${(cfg as any).color || '#0f0'}; font-weight:bold; font-size:11px;">${key}</span>
 			`;
 			
 			// checkbox 变化时触发筛选
@@ -157,26 +156,27 @@ class LoggerUI {
 	
 	bindEvents() {
 		this.panel.addEventListener('click', (e) => {
-			if (e.target.id === 'log-auto-btn') {
+			const target = e.target as HTMLElement;
+			if (target.id === 'log-auto-btn') {
 				this.autoScroll = !this.autoScroll;
-				e.target.textContent = this.autoScroll ? 'AUTO:ON' : 'AUTO:OFF';
-				e.target.style.color = this.autoScroll ? '#0f0' : '#666';
+				target.textContent = this.autoScroll ? 'AUTO:ON' : 'AUTO:OFF';
+				target.style.color = this.autoScroll ? '#0f0' : '#666';
 			}
-			if (e.target.id === 'log-save-btn') {
+			if (target.id === 'log-save-btn') {
 				this.saveLogs();
 			}
-			if (e.target.id === 'log-filter-btn') {
+			if (target.id === 'log-filter-btn') {
 				const isHidden = this.filterPanel.style.display === 'none';
 				this.filterPanel.style.display = isHidden ? 'block' : 'none';
-				e.target.textContent = isHidden ? '筛选 ▲' : '筛选 ▼';
+				target.textContent = isHidden ? '筛选 ▲' : '筛选 ▼';
 				if (isHidden) {
 					this.filterPanel.offsetHeight;
 				}
 			}
-			if (e.target.id === 'log-clear-btn') {
+			if (target.id === 'log-clear-btn') {
 				this.core.clear();
 			}
-			if (e.target.id === 'log-close-btn') {
+			if (target.id === 'log-close-btn') {
 				this.hide();
 			}
 		});
@@ -253,16 +253,16 @@ class LoggerUI {
 		this.visible = true;
 		this.panel.style.top = '0';
 		// 通知 toolbar 更新按钮状态
-		if (window.toolbar) window.toolbar.updateLogButton(true);
+		if (window.toolbar) (window as any).toolbar.updateLogButton(true);
 	}
 	
 	hide() {
 		this.visible = false;
 		this.panel.style.top = `-${this.core.config.panel.maxHeight + 50}px`;
 		// 通知 toolbar 更新按钮状态
-		if (window.toolbar) window.toolbar.updateLogButton(false);
+		if (window.toolbar) (window as any).toolbar.updateLogButton(false);
 	}
 }
 
 // 导出
-window.LoggerUI = LoggerUI;
+(window as any).LoggerUI = LoggerUI;
