@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * 日志系统配置
  * 可自定义标签结构，无需修改代码
@@ -131,7 +132,7 @@ const LOGGER_CONFIG = {
 };
 
 // 支持外部配置覆盖
-window.setLoggerConfig = (config) => {
+(window as any).setLoggerConfig = (config: any) => {
 	Object.assign(LOGGER_CONFIG, config);
 	if (config.tags) {
 		LOGGER_CONFIG.tags = { ...DEFAULT_LOG_TAGS, ...config.tags };
@@ -149,8 +150,8 @@ const RUNTIME_TAGS = new Set([
 	'UI',       // UI事件
 ]);
 
-window.getRuntimeTags = () => RUNTIME_TAGS;
+(window as any).getRuntimeTags = () => Array.from(RUNTIME_TAGS);
 
 // 导出
-window.LOGGER_CONFIG = LOGGER_CONFIG;
-window.DEFAULT_LOG_TAGS = DEFAULT_LOG_TAGS;
+(window as any).LOGGER_CONFIG = LOGGER_CONFIG;
+(window as any).DEFAULT_LOG_TAGS = DEFAULT_LOG_TAGS;

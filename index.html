@@ -66,7 +66,7 @@
 		function loadLoader() {
 			return new Promise((resolve, reject) => {
 				const script = document.createElement('script');
-				script.src = 'src/loading-screen.js?t=' + cacheBuster;
+				script.src = 'dist/loading-screen.js?t=' + cacheBuster;
 				script.onload = resolve;
 				script.onerror = reject;
 				document.head.appendChild(script);
@@ -77,7 +77,7 @@
 		function loadScriptLoader() {
 			return new Promise((resolve, reject) => {
 				const script = document.createElement('script');
-				script.src = 'src/script-loader.js?t=' + cacheBuster;
+				script.src = 'dist/script-loader.js?t=' + cacheBuster;
 				script.onload = resolve;
 				script.onerror = reject;
 				document.head.appendChild(script);

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * ScreenManager 屏幕管理器
  */

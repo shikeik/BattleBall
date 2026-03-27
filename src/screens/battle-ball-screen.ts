@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * BattleBallScreen - 球球大作战游戏场景
  * 

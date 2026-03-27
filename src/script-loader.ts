@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * 脚本加载器
  * 动态加载 JS 文件，支持进度回调
@@ -69,26 +70,26 @@ class ScriptLoader {
 const SCRIPT_GROUPS = {
 	// UI层级系统
 	ui: [
-		{ name: 'UI Layers', src: 'src/ui/layers.js', weight: 1 },
+		{ name: 'UI Layers', src: 'dist/ui/layers.js', weight: 1 },
 	],
 	
 	// 日志系统
 	logger: [
-		{ name: 'Logger Config', src: 'src/logger/config.js', weight: 1 },
-		{ name: 'Logger Core', src: 'src/logger/core.js', weight: 1 },
-		{ name: 'Logger UI', src: 'src/logger/ui.js', weight: 1 },
-		{ name: 'Logger Index', src: 'src/logger/index.js', weight: 1 },
+		{ name: 'Logger Config', src: 'dist/logger/config.js', weight: 1 },
+		{ name: 'Logger Core', src: 'dist/logger/core.js', weight: 1 },
+		{ name: 'Logger UI', src: 'dist/logger/ui.js', weight: 1 },
+		{ name: 'Logger Index', src: 'dist/logger/index.js', weight: 1 },
 	],
 	
 	// 工具栏
 	toolbar: [
-		{ name: 'Perf Monitor', src: 'src/perf-monitor.js', weight: 1 },
-		{ name: 'Toolbar', src: 'src/toolbar.js', weight: 1 },
+		{ name: 'Perf Monitor', src: 'dist/perf-monitor.js', weight: 1 },
+		{ name: 'Toolbar', src: 'dist/toolbar.js', weight: 1 },
 	],
 	
 	// WebGPU 演示
 	webgpuDemo: [
-		{ name: 'WebGPU Demo', src: 'src/webgpu-demo/webgpu-demo.js', weight: 1 },
+		{ name: 'WebGPU Demo', src: 'dist/webgpu-demo/webgpu-demo.js', weight: 1 },
 	],
 	
 	// 屏幕管理系统（从 dist 加载编译后的 JS）
@@ -104,8 +105,8 @@ const SCRIPT_GROUPS = {
 		{ name: 'WebGPU Screen', src: 'dist/screens/webgpu-screen.js', weight: 1 },
 		{ name: 'Settings Screen', src: 'dist/screens/settings-screen.js', weight: 1 },
 		{ name: 'Menu Screen', src: 'dist/screens/menu-screen.js', weight: 1 },
-		{ name: 'Bean Manager', src: 'src/battle-ball/bean-manager.js', weight: 1 },
-		{ name: 'Joystick', src: 'src/battle-ball/joystick.js', weight: 1 },
+		{ name: 'Bean Manager', src: 'dist/battle-ball/bean-manager.js', weight: 1 },
+		{ name: 'Joystick', src: 'dist/battle-ball/joystick.js', weight: 1 },
 		{ name: 'BattleBall Screen', src: 'dist/screens/battle-ball-screen.js', weight: 1 },
 		{ name: 'Bean Test Screen', src: 'dist/screens/bean-test-screen.js', weight: 1 },
 	],

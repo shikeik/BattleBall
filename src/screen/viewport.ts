@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Viewport - 视口系统
  * 

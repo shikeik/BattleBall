@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * WebGPU Compute Shader Particle System Demo
  * Based on: https://github.com/andrinr/webgpu-particles

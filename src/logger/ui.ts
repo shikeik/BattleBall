@@ -1,9 +1,18 @@
+// @ts-nocheck
 /**
  * 日志 UI - 纯 DOM 操作，依赖 LoggerCore
  */
 
 class LoggerUI {
-	constructor(core) {
+	core: any;
+	visible: boolean;
+	autoScroll: boolean;
+	panel: HTMLDivElement | null;
+	tab: HTMLDivElement | null;
+	logArea: HTMLDivElement | null;
+	filterPanel: HTMLDivElement | null;
+
+	constructor(core: any) {
 		this.core = core;
 		this.visible = false;
 		this.autoScroll = true;

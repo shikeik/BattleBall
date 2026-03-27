@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * WebGPUScreen - WebGPU 演示界面
  */

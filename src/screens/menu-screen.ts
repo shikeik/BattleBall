@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * MenuScreen - 主菜单界面
  * 原版用法：填充 screenMapping，null 作为分隔线

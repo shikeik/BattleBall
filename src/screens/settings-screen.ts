@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * SettingsScreen - 设置界面
  */

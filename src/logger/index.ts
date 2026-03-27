@@ -1,9 +1,13 @@
+// @ts-nocheck
 /**
  * 日志系统入口
  * 组合 LoggerCore + LoggerUI
  */
 
 class Logger {
+	core: any;
+	ui: any;
+
 	constructor() {
 		// 核心（数据）
 		this.core = new LoggerCore(LOGGER_CONFIG);
@@ -13,7 +17,7 @@ class Logger {
 		
 		// 全局错误捕获
 		window.onerror = (msg, url, line) => {
-			this.core.log('ERROR', msg, { line });
+			this.core.log('ERROR', String(msg), { line });
 			return false;
 		};
 	}

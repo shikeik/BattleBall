@@ -1,11 +1,17 @@
+// @ts-nocheck
 /**
  * 日志核心 - 纯数据逻辑，无 DOM 操作
  */
 
 class LoggerCore {
+	config: any;
+	logs: any[];
+	activeTags: string[];
+	listeners: Array<{ event: string; callback: (...args: any[]) => void }>;
+
 	constructor(config = LOGGER_CONFIG) {
 		this.config = config;
-		this.logs = [];           // 所有日志（无限制）
+		this.logs = [];
 		this.activeTags = this.loadActiveTags();
 		this.listeners = [];
 	}

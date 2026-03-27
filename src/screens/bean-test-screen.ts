@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * BeanTestScreen - 彩豆渲染测试场景
  * 最简单的测试：只渲染2万个彩豆

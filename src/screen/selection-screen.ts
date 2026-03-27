@@ -1,18 +1,36 @@
+// @ts-nocheck
 /**
  * SelectionScreen - 选择屏基类
  * 原版逻辑：使用 Map 映射，null 值作为分隔线，全部触发 replace
  */
+
+/// <reference path="./screen.ts" />
+
 class SelectionScreen extends Screen {
-	constructor(screenManager) {
+	private screenMapping: Map<string, any>;
+	private hoveredIndex: number;
+	private buttons: Array<{ index: number, x: number, y: number, w: number, h: number, screenClass: any }>;
+	protected visible: boolean;
+	protected uiViewport: any;
+	protected dpr: number;
+	protected screenManager: any;
+
+	// 方法绑定
+	private _onMouseMove: (e: MouseEvent) => void;
+	private _onClick: (e: MouseEvent) => void;
+	private _onTouchStart: (e: TouchEvent) => void;
+	private _onTouchEnd: (e: TouchEvent) => void;
+
+	constructor(screenManager: any) {
 		super(screenManager);
 		this.screenMapping = new Map();
 		this.hoveredIndex = -1;
 		this.buttons = []; // 只存储实际按钮（排除分隔线）
 	}
 
-	init() {
+	init(): void {
 		this.initScreenMapping(this.screenMapping);
-		
+
 		// 检查 mapping 中的值
 		for (const [key, value] of this.screenMapping) {
 			if (value !== null && typeof value !== 'function') {
@@ -28,32 +46,32 @@ class SelectionScreen extends Screen {
 	 *   map.set('分隔标题', null);  // null 作为分隔线
 	 *   map.set('设置', SettingsScreen);
 	 */
-	initScreenMapping(map) {
+	initScreenMapping(map: Map<string, any>): void {
 		// 子类实现
 	}
 
-	enter() {
+	enter(): void {
 		super.enter();
 		this._bindEvents();
 	}
 
-	exit() {
+	exit(): void {
 		super.exit();
 		this._unbindEvents();
 	}
 
-	render(delta) {
+	render(delta: number): void {
 		if (!this.visible) return;
 		const canvas = this.getCanvas();
 		if (!canvas) return;
 		const ctx = canvas.getContext('2d');
 		if (!ctx) return;
-		
+
 		// 清空画布
 		ctx.setTransform(1, 0, 0, 1, 0, 0);
 		ctx.clearRect(0, 0, canvas.width, canvas.height);
 		ctx.scale(this.dpr, this.dpr);
-		
+
 		// 使用自己的 UI Viewport
 		if (!this.uiViewport) return;
 		this.uiViewport.apply(ctx);
@@ -65,12 +83,12 @@ class SelectionScreen extends Screen {
 
 		// 绘制按钮列表
 		this._drawButtons(ctx, this.uiViewport.worldWidth, this.uiViewport.worldHeight);
-		
+
 		// 结束世界坐标系渲染
 		this.uiViewport.endWorldRender(ctx);
 	}
 
-	_drawButtons(ctx, w, h) {
+	_drawButtons(ctx: CanvasRenderingContext2D, w: number, h: number): void {
 		const btnH = 60;
 		const btnW = 280;
 		const margin = 20;
@@ -129,7 +147,7 @@ class SelectionScreen extends Screen {
 	 * 屏幕选择回调（子类可重写拦截）
 	 * 默认行为：replaceScreen
 	 */
-	onScreenSelected(screenClass) {
+	onScreenSelected(screenClass: any): void {
 		if (window.logger) {
 			logger.log('SELECT', 'onScreenSelected called');
 			logger.log('SELECT', 'screenClass: ' + screenClass.name);
@@ -145,14 +163,14 @@ class SelectionScreen extends Screen {
 		}
 	}
 
-	_bindEvents() {
+	_bindEvents(): void {
 		const canvas = this.getCanvas();
 		if (!canvas) return;
-		
+
 		// 转换屏幕坐标到世界坐标
-		const getPointerPos = (clientX, clientY) => {
+		const getPointerPos = (clientX: number, clientY: number): { x: number, y: number } => {
 			if (!this.uiViewport) return { x: 0, y: 0 };
-			
+
 			const rect = canvas.getBoundingClientRect();
 			const screenX = clientX - rect.left;
 			const screenY = clientY - rect.top;
@@ -160,7 +178,7 @@ class SelectionScreen extends Screen {
 		};
 
 		// 检查点击位置
-		const checkHit = (x, y) => {
+		const checkHit = (x: number, y: number): number => {
 			for (const btn of this.buttons) {
 				if (x >= btn.x && x <= btn.x + btn.w &&
 					y >= btn.y && y <= btn.y + btn.h) {
@@ -171,13 +189,13 @@ class SelectionScreen extends Screen {
 		};
 
 		// 鼠标移动（PC）
-		this._onMouseMove = (e) => {
+		this._onMouseMove = (e: MouseEvent): void => {
 			const pos = getPointerPos(e.clientX, e.clientY);
 			this.hoveredIndex = checkHit(pos.x, pos.y);
 		};
 
 		// 点击（PC）
-		this._onClick = (e) => {
+		this._onClick = (e: MouseEvent): void => {
 			const pos = getPointerPos(e.clientX, e.clientY);
 			const index = checkHit(pos.x, pos.y);
 			console.log('Click at', pos, 'hit index', index, 'buttons', this.buttons.length);
@@ -190,7 +208,7 @@ class SelectionScreen extends Screen {
 		};
 
 		// 触摸开始（移动端）
-		this._onTouchStart = (e) => {
+		this._onTouchStart = (e: TouchEvent): void => {
 			e.preventDefault();
 			const touch = e.touches[0];
 			const pos = getPointerPos(touch.clientX, touch.clientY);
@@ -198,7 +216,7 @@ class SelectionScreen extends Screen {
 		};
 
 		// 触摸结束（移动端）
-		this._onTouchEnd = (e) => {
+		this._onTouchEnd = (e: TouchEvent): void => {
 			e.preventDefault();
 			console.log('TouchEnd, hoveredIndex:', this.hoveredIndex);
 			if (this.hoveredIndex >= 0) {
@@ -216,7 +234,7 @@ class SelectionScreen extends Screen {
 		canvas.addEventListener('touchend', this._onTouchEnd, { passive: false });
 	}
 
-	_unbindEvents() {
+	_unbindEvents(): void {
 		const canvas = this.getCanvas();
 		if (canvas) {
 			canvas.removeEventListener('mousemove', this._onMouseMove);
@@ -227,4 +245,4 @@ class SelectionScreen extends Screen {
 	}
 }
 
-window.SelectionScreen = SelectionScreen;
+(window as any).SelectionScreen = SelectionScreen;

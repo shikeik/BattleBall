@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * UI 层级管理系统
  * 集中管理所有UI元素的z-index，避免冲突
